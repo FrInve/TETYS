@@ -1,11 +1,11 @@
 # TETYS
 Topics' Evolution That You See
 
-Topics Evolution That You See (TETYS) has been selected for funding (150K Euros) in the NGI Search 2nd Call 2023. *NGI Search* is within the EU programme HORIZON-CL4-2021-HUMAN-01; it has received funding from the *European Union’s Horizon Europe* research and innovation programme under the *grant agreement n. 101069364* and it is framed under Next Generation Internet Initiative.
+Topics Evolution That You See (TETYS) has been selected for funding (150K Euros) in the NGI Search 2nd Call 2023. **NGI Search** is within the EU programme HORIZON-CL4-2021-HUMAN-01; it has received funding from the **European Union’s Horizon Europe** research and innovation programme under the **grant agreement n. 101069364** and it is framed under Next Generation Internet Initiative.
 
-*Duration of the program: August 2023-September 2024*
+**Duration of the program: August 2023-September 2024**
 
-TETYS proposes the next-generation open-source *_Web topic explorer_* inspecting a big textual corpus, projecting results on a dashboard of topic trends with easy-to-drive statistical testing. It is composed of
+TETYS proposes the next-generation open-source **_Web topic explorer_** inspecting a big textual corpus, projecting results on a dashboard of topic trends with easy-to-drive statistical testing. It is composed of
 1. a pipeline for ingesting huge data corpora, extracting highly relevant topics, clustered along orthogonal dimensions
 1. an interactive dashboard, supporting topic visualization as word clouds and exploration of temporal series.
 
@@ -39,17 +39,17 @@ A prototype of climate change-related documents, studying the interest in the to
 
 ## Projects activities track
 
-*October 5th, 2023*:
-Our preprint on CORToViz is on ArXiv! Check it out at https://arxiv.org/abs/2310.03928
+**October 5th, 2023**:
+Our preprint on CORToViz is on ArXiv! Check it out [on arXiv](https://arxiv.org/abs/2310.03928).
 
-*November 1st, 2023*: 
-A first prototype on Climate Change Scientific articles is available at http://gmql.eu/climviz!
+**November 1st, 2023**: 
+A first prototype on Climate Change Scientific articles is available at [http://gmql.eu/climviz](http://gmql.eu/climviz)!
 
-*November 10th, 2023*: 
+**November 10th, 2023**: 
 The project has been presented at the [SFSCON conference](https://www.sfscon.it/programs/2023/) by Francesco Invernici, NOI TechPark – Bolzano/Italy. Nov. 10th-11th, 2023. See the [video and slides](https://www.sfscon.it/talks/the-cord-19-topic-visualizer/).
 
-*February 2nd, 2024*: 
+**February 2nd, 2024**: 
 Anna has been interviewed by NGi Search on our TETYS Project. See the full interview on [The Next Generation Internat (NGI) Community on Funding Box](https://spaces.fundingbox.com/spaces/ngi-community-ngi-innovators/65bcb5c082e68c5758327104).
 
-*March 4th, 2024*: 
+**March 4th, 2024**: 
 Our Master Student Jelena has joined the team to help us improve the data extraction phase and compare BERTopic stages with more up-to-date technologies.
