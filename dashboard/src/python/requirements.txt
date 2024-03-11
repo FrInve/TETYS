@@ -1,0 +1,11 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: linux-64
+bertopic==0.14.1
+matplotlib==3.7.1
+pandas==1.5.2
+pyarrow==10.0.1
+seaborn==0.12.2
+sentence-transformers==2.2.2
+wordcloud
+streamlit
