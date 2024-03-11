@@ -11,6 +11,8 @@ TETYS proposes the next-generation open-source **_Web topic explorer_** inspecti
 
 The first [CorToViz prototype](http://geco.deib.polimi.it/cortoviz/) explores the CORD-19 dataset (COVID-19 / SARS-CoV-2 virus research abstracts). Many different domains will be explored using TETYS (e.g., climate change and controversial debates on social media).
 
+-----------------------------------------------------------------
+
 ### What is our starting point?
 
 CORToViz is the first research demonstrator showcasing the TETYS approach
@@ -24,6 +26,8 @@ Build pilot working on other domains of interest for Web users: preparing for fu
 ### Objectives with NGI Search
 1. develop the testbed into a solid architecture (reaching a mature TRL 5)
 2. understand crucial aspects of approaching TRL 6 (being ready to address the market)
+
+-----------------------------------------------------------------
 
 ## Excellence
 TETYS will involve the use of data-driven statistical / visualization-based strategies for making Web users: 1) aware of the semantic content of analyzed datasets; 2) understand the temporal evolution of the topics.
@@ -43,7 +47,7 @@ A prototype of climate change-related documents, studying the interest in the to
 Our preprint on CORToViz is on ArXiv! Check it out [on arXiv](https://arxiv.org/abs/2310.03928).
 
 **November 1st, 2023**: 
-A first prototype on Climate Change Scientific articles is available at [http://gmql.eu/climviz](http://gmql.eu/climviz)!
+A first prototype on Climate Change Scientific articles is available at [http://gmql.eu/climviz]([http://gmql.eu/climviz](http://geco.deib.polimi.it/climviz/))!
 
 **November 10th, 2023**: 
 The project has been presented at the [SFSCON conference](https://www.sfscon.it/programs/2023/) by Francesco Invernici, NOI TechPark – Bolzano/Italy. Nov. 10th-11th, 2023. See the [video and slides](https://www.sfscon.it/talks/the-cord-19-topic-visualizer/).
