@@ -1,7 +1,8 @@
 from pydantic import BaseModel
+from typing import List, Tuple
 
 
 class SearchRecord(BaseModel):
     id: int
-    terms: str
+    terms: List[Tuple[str, float]]
     relevance: float

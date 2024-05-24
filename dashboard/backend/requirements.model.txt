@@ -1,0 +1,11 @@
+bertopic==0.14.1
+matplotlib==3.7.1
+pandas==1.5.2
+pyarrow==10.0.1
+seaborn==0.12.2
+sentence-transformers==2.2.2
+wordcloud
+streamlit
+scikit-learn==1.2.2
+numba==0.57.0
+pynndescent==0.5.10
