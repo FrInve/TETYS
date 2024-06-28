@@ -57,3 +57,10 @@ Anna has been interviewed by NGi Search on our TETYS Project. See the full inter
 
 **March 4th, 2024**: 
 Our Master Student Jelena has joined the team to help us improve the data extraction phase and compare BERTopic stages with more up-to-date technologies.
+
+**April 8th, 2024**: 
+TETYS has been presented in the Department of Electronics, Information and Bioengineering at Politecnico di Milano (see [here](https://www.deib.polimi.it/eng/european-projects/details/499)).
+
+**June 7th, 2024**: Anna presented the TETYS project in the context of the Research Project Exhibition at the CAiSE Conference (Limassol, Cyprus)
+(see Poster [here](https://github.com/user-attachments/files/16032054/Bernasconi_CAiSE_2024_RPE_TETYS.pdf))
+
