@@ -61,6 +61,9 @@ Our Master Student Jelena has joined the team to help us improve the data extrac
 **April 8th, 2024**: 
 TETYS has been presented in the Department of Electronics, Information and Bioengineering at Politecnico di Milano (see [here](https://www.deib.polimi.it/eng/european-projects/details/499)).
 
+**May 2nd, 2024**:
+Our Master Students Francesca and Amir have joined the team to help us improve the User experience and statistical tests.
+
 **June 7th, 2024**: Anna presented the TETYS project in the context of the Research Project Exhibition at the CAiSE Conference (Limassol, Cyprus)
 (see Poster [here](https://github.com/user-attachments/files/16032054/Bernasconi_CAiSE_2024_RPE_TETYS.pdf))
 
