@@ -11,6 +11,7 @@ class Topic(BaseModel):
     frequency: str
     absolute_frequencies: List[int]
     relative_frequencies: List[float]
+    rankings: List[int]
 
 
 class TimeSeriesHolder:
@@ -28,6 +29,7 @@ class TimeSeriesHolder:
         self.df_relative_frequencies = self.prepare_dataframe(
             self.df_relative_frequencies
         )
+        self.init_rankings()
 
     @staticmethod
     def prepare_dataframe(df: pd.DataFrame, round: bool = False) -> pd.DataFrame:
@@ -45,10 +47,16 @@ class TimeSeriesHolder:
             df = df.round(0).astype(int)
         return df
 
-    def get_topic(self, topic_id: int) -> Tuple[List[float], List[float]]:
+    def init_rankings(self):
+        self.rankings = self.df_absolute_frequencies.rank(
+            axis=1, ascending=False, method="min"
+        )
+
+    def get_topic(self, topic_id: int) -> Tuple[List[float], List[float], List[int]]:
         return (
             self.df_absolute_frequencies.loc[:, str(topic_id)].to_list(),
             self.df_relative_frequencies.loc[:, str(topic_id)].to_list(),
+            self.rankings.loc[:, str(topic_id)].to_list(),
         )
 
     def get_starting_date(self) -> str:

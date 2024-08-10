@@ -4,9 +4,13 @@ from typing import List, Dict
 from models.topic import Topic
 from models.search import SearchRecord
 from models.project import Project, load_projects
-from models.context import Context
+
+# from models.context import Context
+from models.analysis import *
 from models.settings import get_settings
 from wordcloud import WordCloud
+from crossref.restful import Works
+import re
 
 ### State of the application ###
 projects: Dict[str, Project] = load_projects(get_settings().path_projects)
@@ -39,20 +43,32 @@ def read_project(project_id: str) -> Project:
     return projects[project_id].as_model()
 
 
-@app.get("/paper")
-def read_paper():
-    return {"paper": "paper"}
+# @app.get("/paper")
+# def read_paper():
+#     return {"paper": "paper"}
 
 
-@app.get("/context")
-def read_context(project_id: str) -> Context:
-    if project_id not in projects:
-        raise HTTPException(status_code=404, detail="Project not found")
-    return projects[project_id].context.to_model()
+# @app.get("/context")
+# def read_context(project_id: str) -> Context:
+#     if project_id not in projects:
+#         raise HTTPException(status_code=404, detail="Project not found")
+#     return projects[project_id].context.to_model()
 
 
 @app.get("/topic")
-def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
+async def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
+    doi_pattern = r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+\b"
+    doi_matches = re.findall(doi_pattern, keywords)
+    if len(doi_matches) > 0:
+        works = Works()
+        doi = doi_matches[0]
+        try:
+            paper = works.doi(doi)
+            keywords = paper["title"]
+        except:
+            pass
+        keywords = paper["title"]
+
     model = projects[project_id].model
     topics, similarities = model.find_topics(keywords, top_n=10)
 
@@ -81,6 +97,7 @@ def read_topic(project_id: str, topic_id: int) -> Topic:
             frequency=project.time_series.get_frequency(),
             absolute_frequencies=time_series[0],
             relative_frequencies=time_series[1],
+            rankings=time_series[2],
         )
         return topic
     except KeyError:
@@ -109,9 +126,27 @@ def get_wordcloud(topic_id: int, project_id: str) -> str:
     return Response(content=wc.to_svg(), media_type="image/svg+xml")
 
 
-@app.post("/analysis/")
-def request_analysis(project_id: int, topic_id: str, test_id: int):
-    return {"analysis": "analysis"}
+@app.get("/analysis/")
+def read_analysis(project_id: int) -> List[str]:
+    return ["single_topic-two_intervals", "single_topic-multiple_intervals"]
+
+
+@app.post("/analysis/single_topic-two_intervals")
+def request_test_single_topic_two_intervals(
+    form: SingleTopicTwoIntervalTestForm,
+) -> TestResult:
+    test = SingleTopicTwoIntervalTest(form)
+    test.compute()
+    return test.get_result()
+
+
+@app.post("/analysis/single_topic-multiple_intervals")
+def request_test_single_topic_multiple_intervals(
+    form: SingleTopicMultipleIntervalTestForm,
+) -> TestResult:
+    test = SingleTopicMultipleIntervalTest(form)
+    test.compute()
+    return test.get_result()
 
 
 @app.get("/download")
