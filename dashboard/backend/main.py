@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import ORJSONResponse, Response
 from typing import List, Dict
-from models.topic import Topic
+from models.topic import Topic, Terms
 from models.search import SearchRecord
 from models.project import Project, load_projects
 
@@ -34,6 +34,13 @@ def read_info():
 @app.get("/project")
 def read_project() -> List[str]:
     return [project.name for project in projects]
+
+
+@app.get("/project/{project_id}/trending")
+def get_trending_topics(project_id: str) -> List[str]:
+    project = projects[project_id]
+    trending_topics = project.get_trending_topics()
+    return trending_topics
 
 
 @app.get("/project/{project_id}")
@@ -126,8 +133,20 @@ def get_wordcloud(topic_id: int, project_id: str) -> str:
     return Response(content=wc.to_svg(), media_type="image/svg+xml")
 
 
+@app.get(
+    "/topic/{topic_id}/terms",
+    responses={
+        200: {"description": "List of terms of the topic"},
+        404: {"description": "Topic not found"},
+    },
+)
+def get_terms(topic_id: int, project_id: str) -> Terms:
+    terms = projects[project_id].model.get_topic(topic_id)
+    return Terms(id=topic_id, terms=terms)
+
+
 @app.get("/analysis/")
-def read_analysis(project_id: int) -> List[str]:
+def read_analysis(project_id: str) -> List[str]:
     return ["single_topic-two_intervals", "single_topic-multiple_intervals"]
 
 

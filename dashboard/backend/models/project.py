@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from functools import lru_cache
 from utils import logger
 import os
-from typing import Dict
+from typing import Dict, List
 from bertopic import BERTopic
 from models.topic import TimeSeriesHolder
 from models.context import ContextHolder
@@ -59,6 +59,9 @@ class FullProject:
             long_description=self.long_description,
             picture=self.picture,
         )
+
+    def get_trending_topics(self) -> List[str]:
+        return self.time_series.get_trending_topics()
 
 
 @lru_cache()

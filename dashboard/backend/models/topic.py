@@ -67,3 +67,14 @@ class TimeSeriesHolder:
 
     def get_frequency(self) -> str:
         return self.df_absolute_frequencies.index.freqstr
+
+    def get_trending_topics(self) -> List[str]:
+        # Get rankings of topics for the last available date
+        top10_topics = self.rankings.iloc[-1].sort_values().index[:11]
+        top10_topics = top10_topics[top10_topics != "-1"][:10]
+        return top10_topics.tolist()
+
+
+class Terms(BaseModel):
+    id: int
+    terms: List[Tuple[str, float]]
