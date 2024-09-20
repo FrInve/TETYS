@@ -1,6 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import ORJSONResponse, Response
-from typing import List, Dict
+from typing import List, Dict, Annotated
 from models.topic import Topic, Terms
 from models.search import SearchRecord
 from models.project import Project, load_projects
@@ -86,7 +86,13 @@ async def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
 
 
 @app.get("/topic/{topic_id}")
-def read_topic(project_id: str, topic_id: int) -> Topic:
+async def read_topic(
+    project_id: str,
+    topic_id: int,
+    resolution: Annotated[str | None, Query(regex="^\d+[a-zA-Z]$")] = None,
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> Topic:
 
     if project_id not in projects:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -94,14 +100,27 @@ def read_topic(project_id: str, topic_id: int) -> Topic:
     project = projects[project_id]
     try:
         terms = project.model.get_topic(topic_id)
-        time_series = project.time_series.get_topic(topic_id)
+
+        # Set default values
+        if resolution is None:
+            resolution = project.time_series.get_frequency()
+            if resolution is None:
+                resolution = "28"  # default resolution
+        if start_date is None:
+            start_date = project.time_series.get_starting_date()
+        if end_date is None:
+            end_date = project.time_series.get_ending_date()
+
+        time_series = project.time_series.get_topic(
+            topic_id, resolution, start_date, end_date
+        )
 
         topic = Topic(
             id=topic_id,
             terms=terms,
-            start_date=project.time_series.get_starting_date(),
-            end_date=project.time_series.get_ending_date(),
-            frequency=project.time_series.get_frequency(),
+            start_date=start_date,
+            end_date=end_date,
+            frequency=start_date,
             absolute_frequencies=time_series[0],
             relative_frequencies=time_series[1],
             rankings=time_series[2],

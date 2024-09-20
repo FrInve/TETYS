@@ -52,11 +52,25 @@ class TimeSeriesHolder:
             axis=1, ascending=False, method="min"
         )
 
-    def get_topic(self, topic_id: int) -> Tuple[List[float], List[float], List[int]]:
+    def get_topic(
+        self, topic_id: int, resolution: str, start_date: str, end_date: str
+    ) -> Tuple[List[float], List[float], List[int]]:
+        start_date = pd.to_datetime(start_date, format="%Y-%m-%d")
+        end_date = pd.to_datetime(end_date, format="%Y-%m-%d")
+        print(resolution)
         return (
-            self.df_absolute_frequencies.loc[:, str(topic_id)].to_list(),
-            self.df_relative_frequencies.loc[:, str(topic_id)].to_list(),
-            self.rankings.loc[:, str(topic_id)].to_list(),
+            self.df_absolute_frequencies.loc[start_date:end_date, str(topic_id)]
+            .resample(resolution)
+            .sum()
+            .to_list(),
+            self.df_relative_frequencies.loc[start_date:end_date, str(topic_id)]
+            .resample(resolution)
+            .mean()
+            .to_list(),
+            self.rankings.loc[start_date:end_date, str(topic_id)]
+            .resample(resolution)
+            .last()
+            .to_list(),
         )
 
     def get_starting_date(self) -> str:
