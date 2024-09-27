@@ -92,18 +92,21 @@ def load_projects(path: str) -> Dict[str, FullProject]:
                 ),
             )
 
-            project.load_context(
-                project_config["context"]["name"],
-                os.path.join(
-                    path,
-                    project_path,
-                    project_config["context"]["background_trend_path"],
-                ),
-                project_config["context"]["background_trend_title"],
-                os.path.join(
-                    path, project_path, project_config["context"]["events_path"]
-                ),
-            )
+            try:
+                project.load_context(
+                    project_config["context"]["name"],
+                    os.path.join(
+                        path,
+                        project_path,
+                        project_config["context"]["background_trend_path"],
+                    ),
+                    project_config["context"]["background_trend_title"],
+                    os.path.join(
+                        path, project_path, project_config["context"]["events_path"]
+                    ),
+                )
+            except KeyError:
+                logger.info(f"No context data found for project '{project.name}'")
 
             projects[project.name] = project
             logger.info(f"Loaded project '{project.name}'")
