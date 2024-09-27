@@ -119,6 +119,7 @@ async def read_topic(
             id=topic_id,
             title=" ".join([term[0] for term in terms[:3]]),
             terms=terms,
+            total_documents=project.time_series.get_total_documents(topic_id),
             start_date=start_date,
             end_date=end_date,
             frequency=start_date,

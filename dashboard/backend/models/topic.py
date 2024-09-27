@@ -1,12 +1,14 @@
 from pydantic import BaseModel
 from typing import List, Tuple
 import pandas as pd
+from functools import cache
 
 
 class Topic(BaseModel):
     id: int
     title: str
     terms: List[Tuple[str, float]]
+    total_documents: int
     start_date: str
     end_date: str
     frequency: str
@@ -88,6 +90,10 @@ class TimeSeriesHolder:
         top10_topics = self.rankings.iloc[-1].sort_values().index[:11]
         top10_topics = top10_topics[top10_topics != "-1"][:10]
         return top10_topics.tolist()
+
+    @cache
+    def get_total_documents(self, topic) -> int:
+        return self.df_absolute_frequencies.loc[:, str(topic)].sum()
 
 
 class Terms(BaseModel):
