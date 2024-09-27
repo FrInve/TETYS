@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import ORJSONResponse, Response
 from typing import List, Dict, Annotated
 from models.topic import Topic, Terms
+from models.document import Document
 from models.search import SearchRecord
 from models.project import Project, load_projects
 
@@ -164,6 +165,32 @@ def get_wordcloud(topic_id: int, project_id: str) -> str:
 def get_terms(topic_id: int, project_id: str) -> Terms:
     terms = projects[project_id].model.get_topic(topic_id)
     return Terms(id=topic_id, terms=terms)
+
+
+@app.get(
+    "/topic/{topic_id}/documents",
+    responses={
+        200: {"description": "List of documents of the topic"},
+        404: {"description": "Topic not found"},
+    },
+)
+def get_relevant_documents_for_topic(
+    topic_id: int, project_id: str, size: int | None = 5
+) -> List[Document]:
+    docs = [
+        Document(
+            id=str(i),
+            title="title",
+            date="1970-01-01",
+            content="content",
+            authors="authors",
+            reference="reference",
+            url="url",
+            num_of_citations=0,
+        )
+        for i in range(size)
+    ]
+    return docs
 
 
 @app.get("/analysis/")
