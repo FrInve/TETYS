@@ -5,6 +5,7 @@ import pandas as pd
 
 class Topic(BaseModel):
     id: int
+    title: str
     terms: List[Tuple[str, float]]
     start_date: str
     end_date: str

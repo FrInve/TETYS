@@ -33,7 +33,7 @@ def read_info():
 
 @app.get("/project")
 def read_project() -> List[str]:
-    return [project.name for project in projects]
+    return [project.name for project in projects.values()]
 
 
 @app.get("/project/{project_id}/trending")
@@ -117,6 +117,7 @@ async def read_topic(
 
         topic = Topic(
             id=topic_id,
+            title=" ".join([term[0] for term in terms[:3]]),
             terms=terms,
             start_date=start_date,
             end_date=end_date,
