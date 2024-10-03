@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import ORJSONResponse, Response
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Annotated
 from models.topic import Topic, Terms
 from models.document import Document
@@ -20,6 +21,16 @@ projects: Dict[str, Project] = load_projects(get_settings().path_projects)
 ### Endpoints ###
 
 app = FastAPI(default_response_class=ORJSONResponse)
+
+### CORS ###
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
