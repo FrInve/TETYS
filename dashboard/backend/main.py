@@ -134,7 +134,7 @@ async def read_topic(
             total_documents=project.time_series.get_total_documents(topic_id),
             start_date=start_date,
             end_date=end_date,
-            frequency=start_date,
+            frequency=resolution,
             absolute_frequencies=time_series[0],
             relative_frequencies=time_series[1],
             rankings=time_series[2],
