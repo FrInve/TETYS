@@ -89,11 +89,26 @@ async def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
         keywords = paper["title"]
 
     model = projects[project_id].model
+    time_series = projects[project_id].time_series
     topics, similarities = model.find_topics(keywords, top_n=10)
 
+    titles = [
+        ", ".join([term[0].capitalize() for term in model.get_topic(topic)[:3]])
+        for topic in topics
+    ]
+    total_documents = [time_series.get_total_documents(topic) for topic in topics]
+
     return [
-        SearchRecord(id=topic, terms=model.get_topic(topic), relevance=similarity)
-        for topic, similarity in zip(topics, similarities)
+        SearchRecord(
+            id=topic,
+            terms=model.get_topic(topic),
+            relevance=similarity,
+            title=title,
+            total_documents=total_docs,
+        )
+        for topic, similarity, title, total_docs in zip(
+            topics, similarities, titles, total_documents
+        )
     ]
 
 
@@ -129,7 +144,7 @@ async def read_topic(
 
         topic = Topic(
             id=topic_id,
-            title=" ".join([term[0] for term in terms[:3]]),
+            title=", ".join([term[0].capitalize() for term in terms[:3]]),
             terms=terms,
             total_documents=project.time_series.get_total_documents(topic_id),
             start_date=start_date,
