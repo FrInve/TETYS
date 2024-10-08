@@ -151,7 +151,9 @@ if __name__ == "__main__":
             best_score = current_score
             best_params = params
             logging.info(f"Found params achieving DBCV score {best_score:.3f}")
-            if best_score >= 0.35:
+            if best_score >= 0.40:
+                ### Fit a model with the best parameters - only if the score is good enough
+                logging.info("Creating a BERTopic model with the best parameters...")
                 # Init a BERTopic model
                 topic_model = create_model(
                     pipe.named_steps["umap"], pipe.named_steps["hdbscan"]
