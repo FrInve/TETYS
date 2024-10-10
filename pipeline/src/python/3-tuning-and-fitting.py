@@ -21,19 +21,20 @@ from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModel
 from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 from sklearn.model_selection import ParameterSampler
+from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean.parquet"
+DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
 BEST_MODELS_PATH = "./models/tuning/"
 DATASET_TEXT_FEATURE = (
-    "abstract"  # In the dataset file, the column name that contains the text data
+    "Title"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this research title and abstract: "
+TASK_FOR_LLM = "Cluster this research title:"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
 NUMBER_OF_ITERATIONS = 100
-TOKENIZER = "Salesforce/SFR-Embedding-2_R"
-EMBEDDING_MODEL = "Salesforce/SFR-Embedding-2_R"
+TOKENIZER = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 ### END OF CONFIGURATION ###
 
@@ -43,7 +44,7 @@ def create_model(umap_model_, hdbscan_model_):
     Create a BERTopic model with the initialized UMAP and HDBSCAN models
     """
     vectorizer_model = CountVectorizer(
-        stop_words="english", token_pattern="(?u)\\b[\\w-]+\\b"
+        stop_words=list(STOP_WORDS), token_pattern="(?u)\\b[\\w-]+\\b"
     )
     ctfidf_model = ClassTfidfTransformer(reduce_frequent_words=True)
     representation_model = KeyBERTInspired()
@@ -54,7 +55,7 @@ def create_model(umap_model_, hdbscan_model_):
         task="feature-extraction",
         model=EMBEDDING_MODEL,
         tokenizer=tokenizer,
-        device="cuda",
+        device="cpu",
     )
 
     topic_model = BERTopic(

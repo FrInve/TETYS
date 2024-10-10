@@ -13,11 +13,11 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean.parquet"
+DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
 DATASET_TEXT_FEATURE = (
-    "abstract"  # In the dataset file, the column name that contains the text data
+    "Title"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this research title and abstract: "
+TASK_FOR_LLM = "Cluster this research title:"
 OUTPUT_PATH = "./data/interim/embeddings.npy"
 
 ### END OF CONFIGURATION ###
@@ -72,15 +72,15 @@ def last_token_pool(
 
 # Create custom backend
 # Set the model and tokenizer to use - from Hugging Face
-tokenizer = "Salesforce/SFR-Embedding-2_R"
-embedding_model = "Salesforce/SFR-Embedding-2_R"
-model = "Salesforce-SFR-Embedding-2_R"
+tokenizer = "sentence-transformers/all-MiniLM-L6-v2"
+embedding_model = "sentence-transformers/all-MiniLM-L6-v2"
+model = "sentence-transformers/all-MiniLM-L6-v2"
 
 # Use a pre-defined transformer pipeline "feature-extraction" to
 # transform a given document into the embeddings
 tokenizer = AutoTokenizer.from_pretrained(tokenizer)
 embedding_model = pipeline(
-    task="feature-extraction", model=embedding_model, tokenizer=tokenizer, device="cuda"
+    task="feature-extraction", model=embedding_model, tokenizer=tokenizer, device="cpu"
 )
 print("Model loaded")
 
@@ -105,7 +105,7 @@ if not os.path.exists(OUTPUT_PATH):
 
 
 for text in tqdm(passages, total=len(passages)):
-    inputs = tokenizer(text, return_tensors="pt", padding=True).to("cuda")
+    inputs = tokenizer(text, return_tensors="pt", padding=True).to("cpu")
     with torch.no_grad():
         outputs = embedding_model.model(**inputs)
     last_hidden_states = outputs.last_hidden_state

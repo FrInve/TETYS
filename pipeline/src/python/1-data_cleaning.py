@@ -3,13 +3,17 @@
 
 
 import pandas as pd
-from src.data import preprocess as prep
+from data import preprocess as prep
+from neo4j_extraction.extraction import giveMeDataLaws as getDataframe
 import dask
 import dask.multiprocessing
 
 if __name__ == "__main__":
-    df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
 
+    df = getDataframe()
+    #df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
+
+    """ 
     df_clean = (
         df.pipe(prep.start_pipeline)
         .pipe(prep.remove_nas)
@@ -19,17 +23,25 @@ if __name__ == "__main__":
         .pipe(prep.select_time_window)
         .pipe(prep.add_full_text)
     )
+    """
 
+    df_clean = (
+        df.pipe(prep.start_pipeline)
+        .pipe(prep.remove_nas)
+    )
+
+    """"
     with dask.config.set(scheduler="processes", num_workers=8):
         df_clean_2 = (
             df_clean.pipe(prep.start_pipeline)
             .pipe(prep.detect_language)
             .pipe(prep.select_language)
         )
-
+    """
+    """
     df_clean_2.astype(
         {
-            "cord_uid": "string",
+            "ID": "string",
             "sha": "string",
             "source_x": "string",
             "title": "string",
@@ -51,3 +63,10 @@ if __name__ == "__main__":
             "language": "string",
         }
     ).to_parquet("./data/processed/metadata_clean.parquet")
+    """
+    df_clean.astype(
+        {
+            "ID": "string",
+            "Title": "string",
+        }
+    ).to_parquet("./data/processed/metadata_clean_laws.parquet")
