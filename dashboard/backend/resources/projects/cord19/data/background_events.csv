@@ -1,0 +1,13 @@
+Date,Event,Included,Source
+2019-12-01,"First cases emerge in China",1,macmillan
+2020-01-23,"Virus emerges in Europe",0,macmillan
+2020-01-31,"WHO declares a global health emergency",1,macmillan
+2020-03-01,"Lockdowns",1,macmillan
+2020-07-01,"Beginning of large-scale testing of vaccines",1,macmillan
+2020-12-01,"Virus variants are identified",1,macmillan
+2021-01-01,"Vaccines available to first responders and >65yrs",1,macmillan
+2021-07-01,"Delta variant found worldwide",1,macmillan
+2021-11-01,"WHO identifies Omicron as variant of concern",1,macmillan
+2022-01-01,"Omicron variant makes up more than 99% of new cases",1,macmillan
+2022-02-02,"400 million cases worldwide",1,acm.org
+2022-06-02,"Final release of CORD-19",1,cord-19

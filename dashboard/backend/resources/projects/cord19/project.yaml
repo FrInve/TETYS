@@ -1,0 +1,15 @@
+name: cord19
+short_description: "CORToViz"
+long_description: "The CORD-19 Topic Vizualizer"
+trends_abs_value_path: data/trends_absolute.csv
+trends_rel_value_path: data/trends_relative.csv
+picture_path: ""
+model:
+    model_path: model.bertopic
+    include_embeddings: false
+    embeddings_model: pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb
+context:
+    name: "COVID-19 Pandemic"
+    background_trend_path: data/background_trend.csv
+    background_trend_title: "Worldwide active COVID-19 cases"
+    events_path: data/background_events.csv
