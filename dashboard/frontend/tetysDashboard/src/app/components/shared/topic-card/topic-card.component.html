@@ -1,0 +1,37 @@
+<div class="flex flex-col justify-around items-center">
+    <div class="w-full flex flex-col justify-center items-center">
+        <div class="w-full flex flex-row justify-between items-start">
+            <span class="underline text-xs">Topic: 
+                <span class="font-semibold text-sm">{{ topicObj.title }}</span>
+            </span>
+            <div *ngIf="!selectable">
+                <!-- <span class="text-xs" *ngIf="topicObj.rank === 1">{{ topicObj.rank }}st</span>
+                <span class="text-xs" *ngIf="topicObj.rank !== 1">{{ topicObj.rank }}nd</span> -->
+            </div>
+            <div *ngIf="selectable">
+                <label class="inline-flex items-center" (click)="!disabledSelect ? checkboxClick.emit(topicObj): null">
+                    <input
+                        [disabled]="disabledSelect"
+                        type="checkbox" 
+                        class="w-4 h-4 accent-green-600" 
+                        [checked]="selectedIds.has(topicObj.id.toString())"
+                    />
+                </label>
+            </div>
+        </div>
+        <span *ngIf="hasSimilarityScore" class="w-full">
+            <span class="text-xs">Similarity: </span>
+            <span class="font-semibold text-sm">{{ topicObj.relevance | percent}}</span>
+        </span>
+        <span class="w-full">
+            <span class="text-xs">Published material: </span>
+            <span class="font-semibold text-sm">{{ topicObj.total_documents }}</span>
+        </span>
+    </div>
+    <div class="w-full h-40">
+        <word-cloud   
+        [chartId]="'WordCloud_' + wordCloudId"
+        [wordData]="wordCloudData">
+        </word-cloud>
+    </div>
+</div>

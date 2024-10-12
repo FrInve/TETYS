@@ -1,0 +1,9 @@
+{
+    "/tetys_api": {
+      "target": "http://geco.deib.polimi.it",
+      "secure": false,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }
+  

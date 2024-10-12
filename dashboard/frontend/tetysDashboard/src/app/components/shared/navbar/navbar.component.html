@@ -1,0 +1,24 @@
+<div class="flex justify-between items-center py-6 px-8">
+  <nav class="flex justify-left items-center space-x-6">
+    <img (click)="router.navigate(['/'])" src="assets/tetysTypography.svg" alt="Icon" class="w-14 cursor-pointer">
+    <button
+      class="px-4 py-2 rounded-md mb-1
+      hover:bg-primary-skyBlue hover:text-white hover:shadow-md
+      text-lg font-bold"    
+      [ngClass]="{'bg-primary-darkBlue text-white': isActive('about')}"
+      (click)="setActiveTab('about')"
+    >
+      About
+    </button>
+    <button
+      class="px-4 py-2 rounded-md mb-1
+      hover:bg-primary-skyBlue hover:text-white hover:shadow-md
+      text-lg font-bold"
+      [ngClass]="{'bg-primary-darkBlue text-white': isActive('Dashboards')}"
+      (click)="setActiveTab('Dashboards'); router.navigate(['/'])"
+    >
+      Dashboards
+    </button>
+  </nav>
+  <img *ngIf="rightSideIconUrl" [src]="rightSideIconUrl" alt="topicIcon" class="w-12 cursor-pointer" (click)="navigateToRoute()">
+</div>

@@ -1,0 +1,103 @@
+<style>
+    .double_range_slider_box {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+    }
+    .double_range_slider {
+        width: 95%;
+        margin-left: 15px;
+        height: 8px;
+        position: relative;
+        background-color: #c5c5c5;
+        border-radius: 20px;
+    }
+    .range_track {
+        height: 100%;
+        position: absolute;
+        border-radius: 20px;
+    }
+    
+    .minvalue {
+        position: absolute;
+        padding: 6px 15px;
+        background: #0e5f59;
+        border-radius: 1rem;
+        color: white;
+        bottom: 0;
+        transform: translate(0, -100%);
+        left: 0;
+        font-size: 1rem;
+        transition: left 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        will-change: left, transform;
+    }
+    .maxvalue {
+        position: absolute;
+        padding: 6px 15px;
+        background: #0e5f59;
+        border-radius: 1rem;
+        color: white;
+        top: 0;
+        transform: translate(0, 100%);
+        right: 0;
+        font-size: 1rem;
+        transition: right 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        will-change: right, transform;
+    }
+    input {
+        position: absolute;
+        width: 100%;
+        height: 5px;
+        background: none;
+        pointer-events: none;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+
+<div class="double_range_slider_box p-4 !h-14">
+    <div #parent class="double_range_slider">
+        <span 
+            class="range_track" 
+            [ngStyle]="{'background-color': color}"
+            [ngClass]="{
+                'cursor-grabbing': isDragging,
+                'cursor-grab': !isDragging
+            }"
+            #range
+            (mousedown)="startDragging($event)" 
+            (touchstart)="startDragging($event)">
+        </span>
+
+        <input 
+            #rangeInputStart 
+            [id]="id"
+            (input)="handleInputChange($event)" 
+            [value]="minRange"
+            type="range" 
+            class="min" 
+            min="0" 
+            max="100" 
+            step="0" 
+        />
+        <input 
+            #rangeInputEnd 
+            [id]="id"
+            (input)="handleInputChange($event)" 
+            [value]="maxRange"
+            type="range" 
+            class="max" 
+            min="0" 
+            max="100"
+            step="0" 
+        />
+
+        <div class="absolute text-sm" #minval></div>
+        <div class="absolute text-sm" #maxval></div>
+    </div>
+</div>

@@ -1,0 +1,29 @@
+<style>
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent gray */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99;
+    }
+
+    .popup-content {
+        position: absolute;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<div *ngIf="position" class="overlay" (click)="onOverlayClick($event)">
+    <div 
+        [class]="'popup-content ' + extraContentClass" 
+        [ngStyle]="getStyles()" 
+        (click)="$event.stopPropagation()">
+        <ng-content></ng-content>
+    </div>
+</div>

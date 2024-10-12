@@ -1,0 +1,248 @@
+<style>
+    /* Custom styles for the thumbs */
+    .thumb-thumbLeft::-webkit-slider-thumb, .thumb-thumbRight::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #4299e1; /* Tailwind's blue-500 */
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        position: relative;
+        z-index: 10;
+    }
+
+    .thumb-thumbLeft::-moz-range-thumb, .thumb-thumbRight::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #4299e1;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid white;
+        position: relative;
+        z-index: 10;
+    }
+
+    /* Pointer events for custom thumb */
+    .thumb-thumbLeft, .thumb-thumbRight {
+        pointer-events: all;
+    }
+</style>
+
+<div [class]="'bg-custom-gradient-' + bgColor + ' min-h-screen'">
+    <app-navbar [rightSideIconUrl]="'assets/' + mainArea + 'Icon.svg'" [routingUrl]="mainArea"/>
+    <div class="w-11/12 flex flex-col justify-between items-center gap-8 m-auto">
+
+        <!-- FIRST SECTION -->
+        <div class="w-full h-fit grid md:grid-cols-2 xs:grid-cols-1 gap-4">
+            <div class="flex-grow flex flex-col items-start justify-between
+                bg-white
+                rounded-lg
+                shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]">
+                <div
+                    class="bg-white p-4 w-full
+                    border-2 border-primary-grey rounded-lg
+                    shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]"
+                >
+                    <span class="text-sm">Keyword:
+                        <span class="font-semibold text-base">Variant</span>
+                    </span>
+                </div>
+                <span class="text-base p-2">Topic:
+                    <span class="font-medium text-lg">Variant</span>
+                </span>
+                <span class="text-base p-2">Similarity:
+                    <span class="font-medium text-lg">82%</span>
+                </span>
+                <span class="text-base p-2">Published material: 
+                    <span class="font-medium text-lg">20 000 +</span>
+                </span>
+                <div class="w-full h-40 p-4">
+                    <word-cloud   
+                        chartId="singleTopicWC" 
+                        [wordData]="[
+                            { word: 'Angular', frequency: 10 },
+                            { word: 'TypeScript', frequency: 8 },
+                            { word: 'JavaScript', frequency: 6 },
+                            { word: 'Python', frequency: 5 },
+                            { word: 'CSS', frequency: 4 }
+                        ]">
+                    </word-cloud>
+                </div>
+
+            </div>
+
+
+            <div class="flex-grow flex flex-col items-start justify-between
+                bg-white
+                rounded-lg
+                shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)] ">
+                <p class="text-lg p-4 font-semibold">Star diagram</p>
+                <div class="w-full h-full p-4 pt-0">
+                    <radar-chart [chartId]="'radarChart'" [chartData]="radarChartData"></radar-chart>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECOND SECTION -->
+        <!-- <time-setting-card class="w-full" [(chartData)]="chartData"/> -->
+
+        <!-- THIRD SECTION -->
+        <div class="w-full h-fit bg-primary-lightGrey2 rounded-lg shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]">
+            <!-- Tabs -->
+            <div class="flex border-b">
+                <button
+                    class="w-1/2 py-2 px-4 text-left text-lg rounded-t-lg font-medium"
+                    [ngClass]="{ 'bg-white shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]': selectedTab === 'Tab1' }"
+                    (click)="selectTab('Tab1')"
+                >
+                    Two-intervals comparison
+                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the number published material of the selected topics over a customizable time period."/>
+                </button>
+                <button
+                    class="w-1/2 py-2 px-4 text-left text-lg rounded-t-lg font-medium"
+                    [ngClass]="{ 
+                        'bg-white shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]': selectedTab === 'Tab2'
+                    }"
+                    (click)="selectTab('Tab2')"
+                >
+                    Multi-intervals comparison
+                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the number published material of selected topics over multiple customizable time periods."/>
+
+                </button>
+            </div>
+            
+            <!-- Tab Content -->
+            <div *ngIf="selectedTab === 'Tab1'">
+                <div class="w-full bg-white rounded-lg">
+                    <div class="relative z-10 -mt-1 text-lg font-medium bg-white p-4 flex justify-between">
+                        Topics temporal trends
+                        <div>
+                            <label class="text-base" for="countries" >Resolution</label>
+                            <select 
+                                (change)="timeResolutionChange($event)"
+                                class="h-8 px-4 ml-4
+                                text-sm bg-white
+                                cursor-pointer
+                                border-2 border-primary-skyBlue2 rounded-lg"
+                            >
+                                <option class="text-sm" value="1">Daily</option>
+                                <option class="text-sm" value="7">Weekly</option>
+                                <option class="text-sm" value="30">Monthly</option>
+                                <option class="text-sm" value="90">3 months</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full h-96 p-4 pt-0">
+                        <line-chart 
+                            chartId="singleTopicChart" 
+                            [chartData]="chartData" 
+                            [hasTag]="false" 
+                            [hasTwoInterval]="true"
+                            [firstInterval]="firstInterval"
+                            (changeFirstInterval)="handleFirstIntervalChange($event)"
+                            [secondInterval]="secondInterval"
+                            (changeSecondInterval)="handleSecondIntervalChange($event)"
+                        />
+                    </div>
+
+                    <p class="relative z-10 -mt-1 text-base bg-white px-10 py-2 font-medium">First Interval</p>
+                    <range-slider
+                        class="mb-4"
+                        [id]="'firstInterval'"
+                        (changeRangeNumbers)="handleFirstIntervalChange($event)"
+                        [minRange]="firstRangeStart" 
+                        [maxRange]="firstRangeEnd" 
+                        color="#9563FF"
+                    />
+                    <p class="relative z-10 -mt-1 text-base bg-white px-10 py-2 font-medium">Second Interval</p>
+                    <range-slider 
+                        [id]="'secondInterval'"
+                        (changeRangeNumbers)="handleSecondIntervalChange($event)"
+                        [minRange]="secondRangeStart" 
+                        [maxRange]="secondRangeEnd" 
+                        color="#EB7100"
+                    />
+                                            
+                </div>
+            </div>
+            <div *ngIf="selectedTab === 'Tab2'">
+                <div class="w-full bg-white rounded-lg">
+                    <p class="relative z-10 -mt-1 text-lg bg-white font-medium p-4">Topics temporal trends</p>
+                    <div class="flex flex-row justify-between items-center text-base px-4">
+                        <span>the periods to compare on the graph</span> 
+                        <div>
+                            <label class="text-base" for="countries" >Grid resolution</label>
+                            <select 
+                                id="countries" 
+                                (change)="gridResolutionChange($event)"
+                                [value]="gridResolution"
+                                class="h-8 px-4 ml-4
+                                text-sm bg-white
+                                cursor-pointer
+                                border-2 border-primary-skyBlue2 rounded-lg"
+                            >
+                                <option class="text-sm" value="7">Weekly</option>
+                                <option class="text-sm" value="30">Monthly</option>
+                                <option class="text-sm" value="90">3 months</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="w-full h-96 p-4 pt-0">
+                        <line-chart 
+                            chartId="singleTopicChart" 
+                            [chartData]="chartData2" 
+                            [hasTag]="false" 
+                            [hasGridSelection]="true"
+                            [gridResolution]="gridResolution"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+          
+        <!-- FOURTH SECTION -->
+        <div class="w-full h-fit bg-primary-lightGrey2 rounded-lg shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15) overflow-hidden mx-4 md:mx-10 mb-4">
+            <table class="w-full table table-bordered">
+                <thead>
+                    <tr class="bg-white">
+                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Title</th>
+                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Authors</th>
+                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Date of publication</th>
+                        <th class="w-1/4 py-4 border-b-2 px-6 text-left text-base font-medium">Reference</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white">
+                    <tr>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
+                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
+                    </tr>
+                    <tr>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of Omycron, a new variant of Covid-19</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
+                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
+                    </tr>
+                    <tr>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
+                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
+                    </tr>
+                    <tr>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
+                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
+                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
+                    </tr>
+                    <!-- Add more rows here -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
