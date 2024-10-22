@@ -1,0 +1,16 @@
+file:/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:/etc/gitconfig	filter.lfs.required=true
+file:/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=true
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	remote.origin.url=https://github.com/FrInve/TETYS.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	branch.main.remote=origin
+file:.git/config	branch.main.merge=refs/heads/main
+file:.git/config	branch.main.vscode-merge-base=origin/main
+file:.git/config	branch.v2-LLM-pipeline-laws.remote=origin
+file:.git/config	branch.v2-LLM-pipeline-laws.merge=refs/heads/v2-LLM-pipeline-laws
+file:.git/config	branch.v2-LLM-pipeline-laws.vscode-merge-base=origin/main
