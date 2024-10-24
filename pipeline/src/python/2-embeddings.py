@@ -17,7 +17,7 @@ DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
 DATASET_TEXT_FEATURE = (
     "Title"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this research title:"
+TASK_FOR_LLM = "Cluster this laws titles and texts:"
 OUTPUT_PATH = "./data/interim/embeddings.npy"
 
 ### END OF CONFIGURATION ###

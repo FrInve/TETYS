@@ -1,11 +1,26 @@
-import dask.dataframe as dd
-import dask.multiprocessing
-from langdetect import DetectorFactory, detect
+#import dask.dataframe as dd
+#import dask.multiprocessing
+#from langdetect import DetectorFactory, detect
+import pandas as pd
 from pandas import merge, to_datetime
+
 
 from utils import df_info
 
-DetectorFactory.seed = 0
+#DetectorFactory.seed = 0
+
+def concatenate_articles(group):
+    # Sort articles by article number
+    sorted_group = group.sort_values(by='a.number')
+    # Concatenate texts and titles
+    concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}: {row['a.text']}" for _, row in sorted_group.iterrows())
+    return pd.Series({'text': concatenated_text})
+
+@df_info
+def get_grouped_df(df):
+    df = df.groupby(['l.id']).apply(concatenate_articles).reset_index()
+    df.columns = ['law_id', 'text']
+    return df
 
 @df_info
 def remove_nas(df):

@@ -30,7 +30,7 @@ BEST_MODELS_PATH = "./models/tuning/"
 DATASET_TEXT_FEATURE = (
     "Title"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this research title:"
+TASK_FOR_LLM = "Cluster this laws titles and texts:"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
 NUMBER_OF_ITERATIONS = 100
 TOKENIZER = "sentence-transformers/all-MiniLM-L6-v2"
@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 # Fit a BERTopic model to evaluate its quality
                 logging.info("Fitting the model and transforming data...")
                 topics, probs = topic_model.fit_transform(
-                    documents, embeddings=embeddings
+                    documents,embeddings=embeddings
                 )
                 logging.info("BERTopic model fitted and data transformed.")
 

@@ -25,12 +25,12 @@ def create_and_save_wordcloud(topic_model, topic,save_path):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s | %(levelname)s:%(message)s',filename='./logs/plots.log', encoding='utf-8', level=logging.INFO)
-    logging.info('Started...')
-    topic_model = BERTopic.load('./models/BERTopic_full_2023-04-18', embedding_model="pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb"
+    #logging.basicConfig(format='%(asctime)s | %(levelname)s:%(message)s',filename='./logs/plots.log', encoding='utf-8', level=logging.INFO)
+    #logging.info('Started...')
+    topic_model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/berttopic_10_ottobre', embedding_model='all-MiniLM-L6-v2'
 )
-    logging.info('Model loaded')
-    root_path = './reports/plots/2023-07-04/'
+    #logging.info('Model loaded')
+    root_path = ''
     for topic_i in range(-1,355):
         create_and_save_wordcloud(topic_model, topic_i, root_path+str(topic_i)+'.svg')
         logging.info(f'Generated wordcloud for topic {topic_i}')

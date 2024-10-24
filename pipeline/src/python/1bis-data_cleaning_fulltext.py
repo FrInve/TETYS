@@ -1,12 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
 import pandas as pd
 from data import preprocess as prep
-from TETYS.pipeline.src.python.neo4j_extraction.extraction_df_onlytitle import giveMeDataLaws as getDataframe
-import dask
-import dask.multiprocessing
+from neo4j_extraction.extraction_df_title_and_article_texts import giveMeDataLaws as getDataframe
 
 if __name__ == "__main__":
 
@@ -27,7 +21,8 @@ if __name__ == "__main__":
 
     df_clean = (
         df.pipe(prep.start_pipeline)
-        .pipe(prep.remove_nas)
+        .pipe(prep.get_grouped_df)
+        #.pipe(prep.remove_nas)
     )
 
     """"
@@ -64,9 +59,13 @@ if __name__ == "__main__":
         }
     ).to_parquet("./data/processed/metadata_clean.parquet")
     """
+
     df_clean.astype(
         {
-            "ID": "string",
-            "Title": "string",
+            "law_id": "string",
+            "text": "string",
         }
-    ).to_parquet("./data/processed/metadata_clean_laws.parquet")
+    ).to_parquet("./data/processed/metadata_clean_laws_full.parquet")
+
+    print(df_clean)
+
