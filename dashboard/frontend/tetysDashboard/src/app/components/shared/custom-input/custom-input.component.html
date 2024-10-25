@@ -1,0 +1,27 @@
+<div class="container flex justify-center items-center">
+    <div class="relative w-full"> 
+        <input 
+            class="h-14 w-full pl-10 pr-20 z-0
+            border-2 border-primary-grey rounded-full
+            shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
+            focus:shadow focus:outline-none"
+            type="text" 
+            [value]="value"
+            (input)="onInputChange($event)">
+        <div class="absolute top-[0.65rem] right-[0.75rem]">
+            <button
+                [disabled]="disabled"
+                (click)="disabled ? null : exploreClick.emit($event)" 
+                class="h-9 px-5 pb-1
+                disabled:opacity-60
+                disabled:hover:bg-primary-skyBlue3
+                text-base
+                border-2 border-primary-skyBlue2 rounded-full
+                shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
+                bg-primary-skyBlue3 hover:bg-primary-skyBlue2">
+                explore
+            </button>
+
+        </div>
+    </div>
+</div>

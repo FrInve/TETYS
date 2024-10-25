@@ -1,0 +1,29 @@
+<div class="flex flex-col items-center gap-16 justify-between">
+    <div class="w-full flex flex-col items-center gap-8">
+      <div class="w-3/5 header1 text-center font-bold py-4">
+        {{ titleTxt }}
+      </div>
+      <div class="md:w-2/4 w-3/4">
+        <div class="body text-center mb-5"> 
+          Search a keyword or type a DOI 
+          <hint-tooltip class="ml-3" tooltipTxt="A DOI, Digital Object Identifier, is a standard code that enables the identification of objects of any type within a digital network and the association of relevant referenced data with them."/>
+        </div>
+          <app-custom-input
+            [disabled]="searchTerm.trim() === ''" 
+            (valueChange)="handleSearch($event)"
+            (exploreClick)="handleExploreClick($event)"
+          />
+      </div>
+    </div>
+
+    <div class="w-full flex flex-col items-center gap-8">
+      <div class="w-2/5 header2 text-center font-bold">
+        Trending topics of the moment
+      </div>
+      <topics-carousel 
+        class="py-4 w-11/12"
+        [data]="topicList"
+        [visibleCards]="3"
+      />
+    </div>
+</div>

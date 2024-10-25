@@ -1,0 +1,15 @@
+version: '3'
+services:
+  tetys_dashboard-frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "4251:80"
+    networks:
+      - tetys-network
+    #command: npm run start -- 
+
+networks:
+    tetys-network:
+      driver: bridge

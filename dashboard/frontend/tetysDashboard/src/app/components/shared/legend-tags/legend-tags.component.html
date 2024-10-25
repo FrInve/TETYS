@@ -1,0 +1,15 @@
+<div class="flex flex-row items-center">
+    <div *ngFor="let series of chartSeries; index as i" 
+        class="
+        cursor-pointer
+        border-2 rounded-lg px-2 py-1 mr-4
+        hover:opacity-60 bg-primary-lightGrey"
+        [ngClass]="{'bg-white': IsFocused(series)}"
+        [style.borderColor]="getBorderColor(i)"
+        (mouseenter)="highlightSeries(series)"
+        (mouseleave)="resetHighlight()"
+        (click)="focusSeries(series)">
+        {{ series.get("name") }}
+    </div>
+</div>
+

@@ -1,0 +1,52 @@
+<div class="w-full bg-white shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)] rounded-lg">
+    <p class="text-lg p-4">Time settings</p>
+    <div class="w-full flex flex-row justify-between items-center p-4 pt-0">
+        <div>
+            <label class="text-base" for="countries" >Resolution</label>
+            <select 
+                id="countries" 
+                (change)="timeResolutionChange($event)"
+                class="h-8 px-4 ml-4
+                text-sm bg-white
+                cursor-pointer
+                border-2 border-primary-skyBlue2 rounded-lg"
+            >
+                <option class="text-sm" value="1" selected>Daily</option>
+                <option class="text-sm" value="7">Weekly</option>
+                <option class="text-sm" value="30">Monthly</option>
+                <option class="text-sm" value="90">3 months</option>
+            </select>
+        </div>
+
+        <div>
+            <!-- Start Date Picker -->
+            <label class="text-base" for="startDatePicker">Beginning</label>
+            <input class="h-8 px-4 ml-4
+                text-sm
+                cursor-pointer
+                border-2 border-primary-skyBlue2 rounded-lg" 
+                #startDatePicker 
+                type="date" 
+                id="startDatePicker" 
+                (change)="dateRangeChanged()"
+            />
+        </div>
+
+        <div>
+            <!-- End Date Picker -->
+            <label class="text-base" for="endDatePicker">Ending</label>
+            <input 
+                class="h-8 px-4 ml-4
+                text-sm
+                cursor-pointer
+                border-2 border-primary-skyBlue2 rounded-lg"
+                #endDatePicker
+                [value]="maxDate"
+                type="date" 
+                id="endDatePicker"
+                (change)="dateRangeChanged()" 
+            />
+        </div>
+
+    </div>
+</div>

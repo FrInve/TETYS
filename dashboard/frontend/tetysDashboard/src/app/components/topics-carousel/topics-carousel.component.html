@@ -1,0 +1,32 @@
+<div class="flex flex-row justify-center items-center">
+  <button
+    (click)="prev()"
+    class="p-2 text-white hover:text-primary-grey"
+  >
+    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+    </svg>
+  </button>
+
+  <div class="flex gap-4 overflow-hidden">
+    <div
+      *ngFor="let item of data; index as i"
+      [ngStyle]="carouselStyle"
+      class="card flex-none bg-white p-4 rounded-lg shadow-[1px_1px_10px_0px_rgba(0,0,0,0.15)]"
+    >
+      <topic-card 
+        [topicObj]="item" 
+        [wordCloudId]="i+''" 
+      />
+    </div>
+  </div>
+
+  <button
+    (click)="next()"
+    class="p-2 text-white hover:text-primary-grey"
+  >
+    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </button>
+</div>
