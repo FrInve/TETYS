@@ -7,6 +7,8 @@ from models.document import Document
 from models.search import SearchRecord
 from models.project import Project, load_projects
 
+import uvicorn
+
 # from models.context import Context
 from models.analysis import *
 from models.settings import get_settings
@@ -203,6 +205,7 @@ def get_terms(topic_id: int, project_id: str) -> Terms:
 def get_relevant_documents_for_topic(
     topic_id: int, project_id: str, size: int | None = 5
 ) -> List[Document]:
+    """
     docs = [
         Document(
             id=str(i),
@@ -217,6 +220,9 @@ def get_relevant_documents_for_topic(
         for i in range(size)
     ]
     return docs
+    """
+    project = projects[project_id]
+    return project.get_documents(topic_id, size)
 
 
 @app.get("/analysis/")
@@ -245,3 +251,7 @@ def request_test_single_topic_multiple_intervals(
 @app.get("/download")
 def read_download():
     return {"download": "download"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

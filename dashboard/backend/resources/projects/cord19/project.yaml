@@ -8,6 +8,14 @@ model:
     model_path: model.bertopic
     include_embeddings: false
     embeddings_model: pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb
+data:
+    documents_path: data/metadata_clean.parquet
+    column_title: title
+    column_content: abstract
+    column_date: publish_time
+    column_authors: authors
+    column_identifier: doi
+    labelled_documents_path: data/metadata.parquet
 context:
     name: "COVID-19 Pandemic"
     background_trend_path: data/background_trend.csv
