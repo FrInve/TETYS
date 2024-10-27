@@ -6,6 +6,7 @@ from models.topic import Topic, Terms
 from models.document import Document
 from models.search import SearchRecord
 from models.project import Project, load_projects
+from functools import lru_cache as cache
 
 import uvicorn
 
@@ -76,6 +77,16 @@ def read_project(project_id: str) -> Project:
 #     return projects[project_id].context.to_model()
 
 
+@cache
+def get_paper_title(doi: str) -> str:
+    try:
+        works = Works()
+        paper = works.doi(doi)
+        return paper["title"][0]
+    except:
+        return ""
+
+
 @app.get("/topic")
 async def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
     # doi_pattern = r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+\b" # This is wrong
@@ -83,14 +94,15 @@ async def search_topic(project_id: str, keywords: str) -> List[SearchRecord]:
     doi_pattern = r"\b10\.\d{4,9}/[-.;()/:\w]+"
     doi_matches = re.findall(doi_pattern, keywords)
     if len(doi_matches) > 0:
-        works = Works()
-        doi = doi_matches[0]
-        try:
-            paper = works.doi(doi)
-            keywords = paper["title"][0]
-        except:
-            pass
-        # keywords = paper["title"]
+        # works = Works()
+        # doi = doi_matches[0]
+        # try:
+        #     paper = works.doi(doi)
+        #     keywords = paper["title"][0]
+        # except:
+        #     pass
+        # # keywords = paper["title"]
+        keywords = get_paper_title(doi_matches[0])
 
     model = projects[project_id].model
     time_series = projects[project_id].time_series
