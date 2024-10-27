@@ -2,6 +2,7 @@ from pydantic import BaseModel
 import duckdb
 import pandas as pd
 from utils import logging
+from functools import lru_cache
 
 
 class Document(BaseModel):
@@ -20,6 +21,7 @@ class Documents:
         self.data_path = data_path
         self.con = duckdb.connect()
 
+    @lru_cache
     def get_documents(self, topic_id: int, n: int = 10) -> list[Document]:
         self.con.execute(
             f"SELECT * FROM read_parquet('{self.data_path}') WHERE topic = {topic_id} LIMIT {n};"
