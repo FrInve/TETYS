@@ -9,6 +9,13 @@ Topics Evolution That You See (TETYS) is a beneficiary of the NGI Search 2nd Cal
 
 **Duration of the program: September 2023-September 2024**
 
+<img src="https://www.ngisearch.eu/download/FlamingoThemes/NGISearch2/NGISearch_logo_tag_icon.svg?rev=1.1" width="300">
+<br>
+<br>
+<img src="https://github.com/user-attachments/assets/a3283b38-f8d9-4ff8-965c-541229484232" width="150">
+
+---
+
 See [our WIKI page](https://github.com/FrInve/TETYS/wiki) for full documentation.
 
 ---
@@ -82,16 +89,4 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 We are still working on testing and validating the application. 
 More to come on applying TETYS to other domains ( ...like legislative text :) 
 
-
----
-Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or European Commission. Neither the European Union nor the granting authority can be held responsible for them. Funded within the framework of the NGI Search project under grant agreement No 101069364
-
-
-<img src="https://www.ngisearch.eu/download/FlamingoThemes/NGISearch2/NGISearch_logo_tag_icon.svg?rev=1.1" width="300" href="https://www.ngi.eu/ngi-projects/ngi-search/">
-
-<br>
-<br>
-
-<img src="https://github.com/user-attachments/assets/a3283b38-f8d9-4ff8-965c-541229484232" width="150">
----
 
