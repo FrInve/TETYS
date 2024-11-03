@@ -89,4 +89,38 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 We are still working on testing and validating the application. 
 More to come on applying TETYS to other domains ( ...like legislative text :) 
 
+---
+
+## Citation
+
+Please, consider citing this work in your research as:
+
+Bernasconi, A., Invernici, F., & Ceri, S. (2024). TETYS: Towards the Next-Generation Open-Source Web Topic Explorer. In CEUR WORKSHOP PROCEEDINGS (Vol. 3692, pp. 26-33). CEUR-WS. [https://ceur-ws.org/Vol-3692/paper4.pdf](https://ceur-ws.org/Vol-3692/paper4.pdf)
+
+```bibtex
+@inproceedings{bernasconi2024tetys,
+  title={TETYS: Towards the Next-Generation Open-Source Web Topic Explorer},
+  author={Bernasconi, Anna and Invernici, Francesco and Ceri, Stefano and others},
+  booktitle={CEUR WORKSHOP PROCEEDINGS},
+  volume={3692},
+  pages={26--33},
+  year={2024},
+  organization={CEUR-WS}
+}
+```
+
+Invernici, F., Bernasconi, A., & Ceri, S. (2024). Exploring the evolution of research topics during the COVID-19 pandemic. Expert Systems with Applications, 252, 124028. [https://doi.org/10.1016/j.eswa.2024.124028](https://doi.org/10.1016/j.eswa.2024.124028)
+
+```bibtex
+@article{invernici2024exploring,
+  title={Exploring the evolution of research topics during the COVID-19 pandemic},
+  author={Invernici, Francesco and Bernasconi, Anna and Ceri, Stefano},
+  journal={Expert Systems with Applications},
+  volume={252},
+  pages={124028},
+  year={2024},
+  publisher={Elsevier}
+}
+```
+
 
