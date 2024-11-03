@@ -84,7 +84,11 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 **June 7th, 2024**: Anna presented the TETYS project in the context of the Research Project Exhibition at the CAiSE Conference (Limassol, Cyprus)
 (see Poster [here](https://github.com/user-attachments/files/16032054/Bernasconi_CAiSE_2024_RPE_TETYS.pdf))
 
-**August 31st, 2024**: our mature solution for exploring Sustainable Development Goals in scientific literature has been realeased at [https://gmql.eu/tetys](https://geco.deib.polimi.it/tetys)
+**June 25th, 2024**: We had a fruitful discussion with Linknovate and explored our possible market's landscape with their tool.
+
+**August 31st, 2024**: our mature solution for exploring Sustainable Development Goals in scientific literature has been released at [https://gmql.eu/tetys](https://geco.deib.polimi.it/tetys)
+
+**September 27th, 2024**: Anna was interviewed by a researcher at the Department of Business Development and Technology, Aarhus University exploring several aspects of our NGI Search project.
 
 We are still working on testing and validating the application. 
 More to come on applying TETYS to other domains ( ...like legislative text :) 
