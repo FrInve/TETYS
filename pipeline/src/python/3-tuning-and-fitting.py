@@ -24,17 +24,17 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
+DATASET_PATH = "./data/processed/metadata_clean_laws_full.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
 BEST_MODELS_PATH = "./models/tuning/"
 DATASET_TEXT_FEATURE = (
-    "Title"  # In the dataset file, the column name that contains the text data
+    "text"  # In the dataset file, the column name that contains the text data
 )
 TASK_FOR_LLM = "Cluster this laws titles and texts:"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
 NUMBER_OF_ITERATIONS = 100
-TOKENIZER = "sentence-transformers/all-MiniLM-L6-v2"
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+TOKENIZER = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
 ### END OF CONFIGURATION ###
 

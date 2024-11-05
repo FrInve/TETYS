@@ -27,7 +27,7 @@ def create_and_save_wordcloud(topic_model, topic,save_path):
 if __name__ == '__main__':
     #logging.basicConfig(format='%(asctime)s | %(levelname)s:%(message)s',filename='./logs/plots.log', encoding='utf-8', level=logging.INFO)
     #logging.info('Started...')
-    topic_model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/berttopic_10_ottobre', embedding_model='all-MiniLM-L6-v2'
+    topic_model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/bertopic_full_24_ottobre', embedding_model='all-MiniLM-L6-v2'
 )
     #logging.info('Model loaded')
     root_path = ''

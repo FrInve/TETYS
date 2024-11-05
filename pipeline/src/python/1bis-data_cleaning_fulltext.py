@@ -67,5 +67,12 @@ if __name__ == "__main__":
         }
     ).to_parquet("./data/processed/metadata_clean_laws_full.parquet")
 
+    df_clean.astype(
+        {
+            "law_id": "string",
+            "text": "string",
+        }
+    ).to_csv("./data/processed/metadata_clean_laws_full.csv")
+
     print(df_clean)
 

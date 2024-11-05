@@ -9,16 +9,21 @@ from utils import df_info
 
 #DetectorFactory.seed = 0
 
-def concatenate_articles(group):
+def concatenate_articles_ordered(group):
     # Sort articles by article number
     sorted_group = group.sort_values(by='a.number')
     # Concatenate texts and titles
     concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}: {row['a.text']}" for _, row in sorted_group.iterrows())
     return pd.Series({'text': concatenated_text})
 
+def concatenate_articles_not_ordered(group):
+    # Concatenate texts and titles
+    concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}: {row['a.text']}" for _, row in group.iterrows())
+    return pd.Series({'text': concatenated_text})
+
 @df_info
 def get_grouped_df(df):
-    df = df.groupby(['l.id']).apply(concatenate_articles).reset_index()
+    df = df.groupby(['l.id']).apply(concatenate_articles_not_ordered).reset_index()
     df.columns = ['law_id', 'text']
     return df
 
