@@ -4,13 +4,14 @@
 
 import pandas as pd
 from data import preprocess as prep
-from TETYS.pipeline.src.python.neo4j_extraction.extraction_df_onlytitle import giveMeDataLaws as getDataframe
+from neo4j_extraction.extraction_df_onlytitle import giveMeDataLaws as getDataFrameTitles
+from neo4j_extraction.extraction_df_title_and_article_texts import giveMeDataLaws as getDataFrameFull
 import dask
 import dask.multiprocessing
 
 if __name__ == "__main__":
 
-    df = getDataframe()
+    df = getDataFrameTitles()
     #df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
 
     """ 
@@ -25,10 +26,23 @@ if __name__ == "__main__":
     )
     """
 
+    #Uncomment if you are using laws' full text
+    #df_clean = (
+    #    df.pipe(prep.start_pipeline)
+    #    .pipe(prep.get_grouped_df)
+    #    #.pipe(prep.remove_nas)
+
+    #Uncomment if you are using only laws' titles
     df_clean = (
         df.pipe(prep.start_pipeline)
         .pipe(prep.remove_nas)
     )
+
+    #Uncomment if yo are using only the titles (both laws and articles)
+    #df_clean = (
+    #    df.pipe(prep.start_pipeline)
+    #  .pipe(prep.get_grouped_df_ordered_only_titles)
+    #)
 
     """"
     with dask.config.set(scheduler="processes", num_workers=8):
@@ -70,3 +84,11 @@ if __name__ == "__main__":
             "Title": "string",
         }
     ).to_parquet("./data/processed/metadata_clean_laws.parquet")
+
+    #Uncomment to convert datafram to csv
+    #df_clean.astype(
+    #    {
+    #        "law_id": "string",
+    #        "text": "string",
+    #    }
+    #).to_csv("./data/processed/metadata_clean_laws_full.csv")

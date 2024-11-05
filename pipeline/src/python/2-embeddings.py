@@ -13,11 +13,11 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean_laws_full.parquet"
+DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
 DATASET_TEXT_FEATURE = (
-    "text"  # In the dataset file, the column name that contains the text data
+    "Title"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this laws titles and texts:"
+TASK_FOR_LLM = "Cluster these laws titles and texts:"
 OUTPUT_PATH = "./data/interim/embeddings.npy"
 
 ### END OF CONFIGURATION ###
@@ -72,9 +72,9 @@ def last_token_pool(
 
 # Create custom backend
 # Set the model and tokenizer to use - from Hugging Face
-tokenizer = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-embedding_model = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-model = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+tokenizer = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+embedding_model = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+model = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
 # Use a pre-defined transformer pipeline "feature-extraction" to
 # transform a given document into the embeddings
@@ -105,7 +105,7 @@ if not os.path.exists(OUTPUT_PATH):
 
 
 for text in tqdm(passages, total=len(passages)):
-    inputs = tokenizer(text, return_tensors="pt", padding=True, max_length=512, truncation=True, add_special_tokens=True).to("cpu")
+    inputs = tokenizer(text, return_tensors="pt", max_length=512, padding=True, truncation=True, add_special_tokens=True).to("cpu")
     with torch.no_grad():
         outputs = embedding_model.model(**inputs)
     last_hidden_states = outputs.last_hidden_state
