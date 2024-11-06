@@ -90,14 +90,27 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 
 **September 27th, 2024**: Anna was interviewed by a researcher at the Department of Business Development and Technology, Aarhus University exploring several aspects of our NGI Search project.
 
-We are still working on testing and validating the application. 
-More to come on applying TETYS to other domains ( ...like legislative text :) 
+**November 4th, 2024**: We presented TETYS at the Open Web Search standup meeting
+
+We are still working on testing and validating the application. More to come on applying TETYS to other domains ( ...like legislative text :) 
 
 ---
 
 ## Citation
 
 Please, consider citing this work in your research as:
+
+Invernici, F., Curati, F., Jakomov, J., Samavi, A., & Bernasconi, A. (2024). Capturing research literature attitude towards Sustainable Development Goals: an LLM-based topic modeling approach. 
+arXiv preprint arXiv:2411.02943.
+
+```bibtex
+@article{invernici2024capturing,
+  title={Capturing research literature attitude towards Sustainable Development Goals: an LLM-based topic modeling approach},
+  author={Invernici, Francesco and Curati, Francesca and Jakimov, Jelena and Samavi, Amirhossein and Bernasconi, Anna},
+  journal={arXiv preprint arXiv:2411.02943},
+  year={2024}
+}
+```
 
 Bernasconi, A., Invernici, F., & Ceri, S. (2024). TETYS: Towards the Next-Generation Open-Source Web Topic Explorer. In CEUR WORKSHOP PROCEEDINGS (Vol. 3692, pp. 26-33). CEUR-WS. [https://ceur-ws.org/Vol-3692/paper4.pdf](https://ceur-ws.org/Vol-3692/paper4.pdf)
 
