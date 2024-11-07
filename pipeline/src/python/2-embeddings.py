@@ -13,9 +13,9 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean_laws.parquet"
+DATASET_PATH = "./data/processed/metadata_clean_laws_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
-    "Title"  # In the dataset file, the column name that contains the text data
+    "text"  # In the dataset file, the column name that contains the text data
 )
 TASK_FOR_LLM = "Cluster these laws titles and texts:"
 OUTPUT_PATH = "./data/interim/embeddings.npy"
@@ -105,7 +105,7 @@ if not os.path.exists(OUTPUT_PATH):
 
 
 for text in tqdm(passages, total=len(passages)):
-    inputs = tokenizer(text, return_tensors="pt", max_length=512, padding=True, truncation=True, add_special_tokens=True).to("cpu")
+    inputs = tokenizer(text, return_tensors="pt", padding=True, truncation=True, add_special_tokens=True).to("cpu")
     with torch.no_grad():
         outputs = embedding_model.model(**inputs)
     last_hidden_states = outputs.last_hidden_state

@@ -4,14 +4,14 @@
 
 import pandas as pd
 from data import preprocess as prep
-from neo4j_extraction.extraction_df_onlytitle import giveMeDataLaws as getDataFrameTitles
-from neo4j_extraction.extraction_df_title_and_article_texts import giveMeDataLaws as getDataFrameFull
+from neo4j_extraction.df_extraction import giveMeDataLawsTitles as getDataFrameTitles
+from neo4j_extraction.df_extraction import giveMeDataLawsFull as getDataFrameFull
 import dask
 import dask.multiprocessing
 
 if __name__ == "__main__":
 
-    df = getDataFrameTitles()
+    df = getDataFrameFull()
     #df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
 
     """ 
@@ -33,16 +33,16 @@ if __name__ == "__main__":
     #    #.pipe(prep.remove_nas)
 
     #Uncomment if you are using only laws' titles
-    df_clean = (
-        df.pipe(prep.start_pipeline)
-        .pipe(prep.remove_nas)
-    )
-
-    #Uncomment if yo are using only the titles (both laws and articles)
     #df_clean = (
     #    df.pipe(prep.start_pipeline)
-    #  .pipe(prep.get_grouped_df_ordered_only_titles)
+    #    .pipe(prep.remove_nas)
     #)
+
+    #Uncomment if yo are using only the titles (both laws and articles)
+    df_clean = (
+        df.pipe(prep.start_pipeline)
+      .pipe(prep.get_grouped_df_ordered_only_titles)
+    )
 
     """"
     with dask.config.set(scheduler="processes", num_workers=8):
@@ -80,15 +80,15 @@ if __name__ == "__main__":
     """
     df_clean.astype(
         {
-            "ID": "string",
-            "Title": "string",
+            "law_id": "string",
+            "text": "string",
         }
-    ).to_parquet("./data/processed/metadata_clean_laws.parquet")
+    ).to_parquet("./data/processed/metadata_clean_laws_full_titles.parquet")
 
     #Uncomment to convert datafram to csv
     #df_clean.astype(
     #    {
-    #        "law_id": "string",
+    #        "l.id": "string",
     #        "text": "string",
     #    }
     #).to_csv("./data/processed/metadata_clean_laws_full.csv")
