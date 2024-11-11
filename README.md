@@ -86,7 +86,7 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 
 **June 25th, 2024**: We had a fruitful discussion with Linknovate and explored our possible market's landscape with their tool.
 
-**August 31st, 2024**: our mature solution for exploring Sustainable Development Goals in scientific literature has been released at [https://gmql.eu/tetys](https://geco.deib.polimi.it/tetys)
+**August 31st, 2024**: our mature solution for exploring Sustainable Development Goals in scientific literature has been released!
 
 **September 27th, 2024**: Anna was interviewed by a researcher at the Department of Business Development and Technology, Aarhus University exploring several aspects of our NGI Search project.
 
