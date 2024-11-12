@@ -41,7 +41,7 @@ if __name__ == "__main__":
     #Uncomment if yo are using only the titles (both laws and articles)
     df_clean = (
         df.pipe(prep.start_pipeline)
-      .pipe(prep.get_grouped_df_ordered_only_titles)
+        .pipe(prep.get_grouped_df_ordered_only_titles)
     )
 
     """"
@@ -86,9 +86,9 @@ if __name__ == "__main__":
     ).to_parquet("./data/processed/metadata_clean_laws_full_titles.parquet")
 
     #Uncomment to convert datafram to csv
-    #df_clean.astype(
-    #    {
-    #        "l.id": "string",
-    #        "text": "string",
-    #    }
-    #).to_csv("./data/processed/metadata_clean_laws_full.csv")
+    df_clean.astype(
+        {
+            "law_id": "string",
+            "text": "string",
+        }
+    ).to_csv("./data/processed/metadata_clean_laws_full_titles.csv")

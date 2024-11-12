@@ -24,13 +24,13 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_clean_laws_full_titles.parquet"
+DATASET_PATH = "./data/processed/metadata_superclean_laws_full_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "./models/tuning/"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster this laws' titles'"
+TASK_FOR_LLM = "Cluster these laws' titles'"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
 NUMBER_OF_ITERATIONS = 100
 #NUMBER_OF_ITERATIONS = 300
