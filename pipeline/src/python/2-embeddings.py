@@ -13,11 +13,11 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_superclean_laws_full_titles.parquet"
+DATASET_PATH = "./data/processed/metadata_superclean_articles_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster these laws titles and texts:"
+TASK_FOR_LLM = "Cluster these laws titles:"
 OUTPUT_PATH = "./data/interim/embeddings.npy"
 
 ### END OF CONFIGURATION ###

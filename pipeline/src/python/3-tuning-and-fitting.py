@@ -24,13 +24,13 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_superclean_laws_full_titles.parquet"
+DATASET_PATH = "./data/processed/metadata_superclean_articles_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre/"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre_titoli_articoli"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster these laws' titles'"
+TASK_FOR_LLM = "Cluster these laws titles'"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
 NUMBER_OF_ITERATIONS = 100
 #NUMBER_OF_ITERATIONS = 300
@@ -121,7 +121,7 @@ if __name__ == "__main__":
         "umap__min_dist": [0.0],
         "umap__n_components": [5, 10, 20],
         "hdbscan__min_samples": [10, 15, 30, 50, 75, 100],
-        "hdbscan__min_cluster_size": list(range(25, 50, 25)),
+        "hdbscan__min_cluster_size": list(range(15, 30, 15)),
         "hdbscan__cluster_selection_method": ["eom", "leaf"],
         "hdbscan__metric": ["euclidean"],
     }
@@ -153,7 +153,7 @@ if __name__ == "__main__":
             best_score = current_score
             best_params = params
             logging.info(f"Found params achieving DBCV score {best_score:.3f}")
-            if best_score >= 0.40:
+            if best_score >= 0.25:
                 ### Fit a model with the best parameters - only if the score is good enough
                 logging.info("Creating a BERTopic model with the best parameters...")
                 # Init a BERTopic model
