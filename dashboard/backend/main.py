@@ -197,6 +197,12 @@ def get_wordcloud(topic_id: int, project_id: str) -> str:
     return Response(content=wc.to_svg(), media_type="image/svg+xml")
 
 
+@cache
+def cached_terms(project_id: str, topic_id: int) -> Terms:
+    terms = projects[project_id].model.get_topic(topic_id)
+    return Terms(id=topic_id, terms=terms)
+
+
 @app.get(
     "/topic/{topic_id}/terms",
     responses={
@@ -205,8 +211,7 @@ def get_wordcloud(topic_id: int, project_id: str) -> str:
     },
 )
 def get_terms(topic_id: int, project_id: str) -> Terms:
-    terms = projects[project_id].model.get_topic(topic_id)
-    return Terms(id=topic_id, terms=terms)
+    return cached_terms(project_id, topic_id)
 
 
 @app.get(
