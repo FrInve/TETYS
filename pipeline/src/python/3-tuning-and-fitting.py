@@ -24,9 +24,9 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_superclean_articles_titles.parquet"
+DATASET_PATH = "./data/processed/metadata_superclean_full_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre_titoli_articoli"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/13_novembre_full_titles/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )

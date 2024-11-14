@@ -10,7 +10,7 @@ DATASET_TEXT_FEATURE = (
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre_titles/model_0.2652', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre_titoli_articoli/model_0.5677', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 
 print(model.get_topics())
 

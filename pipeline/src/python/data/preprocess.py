@@ -40,9 +40,10 @@ def get_grouped_df_not_ordered(df):
 
 @df_info
 def get_grouped_df_ordered_only_titles(df):
-    df = df.groupby(['l.id']).apply(concatenate_only_titles).reset_index()
-    df.columns = ['law_id', 'text']
-    return df
+    df_bis = df.groupby(['l.id']).apply(concatenate_only_titles).reset_index()
+    df_bis.columns = ['l.id', 'text']
+    #df_bis = pd.concat([df_bis, df['l.id'].rename("law_id")], axis=1)
+    return df_bis
 
 @df_info
 def remove_nas(df):

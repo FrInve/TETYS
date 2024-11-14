@@ -14,7 +14,7 @@ import dask.multiprocessing
 
 if __name__ == "__main__":
 
-    df = getDataFrameTitles()
+    df = getDataFrameFull()
     #df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
     print(df.shape)
 
@@ -37,15 +37,17 @@ if __name__ == "__main__":
     #    #.pipe(prep.remove_nas)
 
     #Uncomment if you are using only laws' titles
-    df_clean = (
-        df.pipe(prep.start_pipeline)
-    )
+    #df_clean = (
+    #   df.pipe(prep.start_pipeline)
+    # )
 
     #Uncomment if yo are using only the titles (both laws and articles)
-    #df_clean = (
-    #    df.pipe(prep.start_pipeline)
-    #    .pipe(prep.get_grouped_df_ordered_only_titles)
-    #)
+    df_clean = (
+        df.pipe(prep.start_pipeline)
+        .pipe(prep.get_grouped_df_ordered_only_titles)
+    )
+
+    print(df_clean)
 
     """"
     with dask.config.set(scheduler="processes", num_workers=8):
@@ -102,13 +104,20 @@ if __name__ == "__main__":
 
     df_clean.astype(
         {
-            "law_id": "string",
+            "l.id": "string",
             "text": "string",
         }
-    ).to_parquet("./data/processed/metadata_superclean_articles_titles.parquet")
+    ).to_parquet("./data/processed/metadata_superclean_full_titles.parquet")
 
     print(df_clean.head())
     print(df_clean.shape)
+
+    df_clean.astype(
+        {
+            "l.id": "string",
+            "text": "string",
+        }
+    ).to_csv("./data/processed/metadata_superclean_full_titles.csv")
 
     #Uncomment to convert datafram to csv
     #df_clean.astype(
