@@ -53,7 +53,7 @@ The frontend contains a Web application working as a *Client* with functionaliti
 Data persistence is taken care of in the *Database* (collecting publications metadata and information describing the topics) and in the *Topic Model registry*, which stores the topics models of the project as large `pickle` objects. These two models can be queried by the central *Server*, i.e., the orchestrator of TETYS: this includes a project registry along with services to perform keyword-based search and similarity-based search over the five different projects (one per macro-area). 
 Keyword-based search is exploited to find ranked topics that are close (i.e., relevant to) specific keywords. Similarity-based search is exploited to find ranked topics that are relevant to a specific point in the embedding space, i.e., one abstract -- identified through its DOI.
 
-<img width="800" alt="image" src="https://github.com/user-attachments/assets/ed78951c-4ec9-4f47-8685-94ef4a69f9ed">
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/d4a210db-cb80-4345-93a4-73700b90e199">
 
 
 ---
