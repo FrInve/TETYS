@@ -14,7 +14,7 @@ import dask.multiprocessing
 
 if __name__ == "__main__":
 
-    df = getDataFrameFull()
+    df = getDataFrameTitles()
     #df = pd.read_csv("./data/raw/2022-06-02/metadata.csv")
     print(df.shape)
 
@@ -37,17 +37,16 @@ if __name__ == "__main__":
     #    #.pipe(prep.remove_nas)
 
     #Uncomment if you are using only laws' titles
-    #df_clean = (
-    #   df.pipe(prep.start_pipeline)
-    # )
-
-    #Uncomment if yo are using only the titles (both laws and articles)
     df_clean = (
-        df.pipe(prep.start_pipeline)
-        .pipe(prep.get_grouped_df_ordered_only_titles)
+       df.pipe(prep.start_pipeline)
     )
 
-    print(df_clean)
+    #Uncomment if yo are using only the titles (both laws and articles)
+    #df_clean = (
+    #    df.pipe(prep.start_pipeline)
+    #    .pipe(prep.get_grouped_df_ordered_only_titles)
+    #)
+
 
     """"
     with dask.config.set(scheduler="processes", num_workers=8):
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     nlp = spacy.load('it_core_news_sm') 
     nlp.Defaults.stop_words |= {'regolamento', 'decreto', 'legislativo', 'decreto-legislativo', 'decreto-legge', 'decreti-legge', 'normativa', 
                         'ministeriale', 'legislazione', 'legge', 'governo', 'articolo', 'attuazione', 'regolamento', 'direttiva', 'comma',
-                        'Regolamento', 'modifica', 'Attuazione', 'testo', 'Testo', 'direttive'}
+                        'Regolamento', 'modifica', 'Attuazione', 'testo', 'Testo', 'direttive', }
     # remove all digits
     df_clean['text'] = df_clean['text'].apply(lambda x:  re.sub('\d+', " ", x))
     # remove punctuation
@@ -98,31 +97,25 @@ if __name__ == "__main__":
     #print('--------------------------------------------------------------------------------------------------------------------')
     # remove stopwords 
     df_clean['text'] = df_clean['text'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
-    # find the 100 most common words
-    #print(Counter(" ".join(df_clean["text"]).split()).most_common(100))
     ######
 
     df_clean.astype(
         {
-            "l.id": "string",
+            "article_id": "string",
             "text": "string",
+            "law_id": "string",
         }
-    ).to_parquet("./data/processed/metadata_superclean_full_titles.parquet")
+    ).to_parquet("./data/processed/metadata_superclean_articles.parquet")
 
     print(df_clean.head())
     print(df_clean.shape)
 
     df_clean.astype(
         {
-            "l.id": "string",
+            "article_id": "string",
             "text": "string",
+            "law_id": "string",
         }
-    ).to_csv("./data/processed/metadata_superclean_full_titles.csv")
+    ).to_csv("./data/processed/metadata_superclean_articles.csv")
 
-    #Uncomment to convert datafram to csv
-    #df_clean.astype(
-    #    {
-    #        "law_id": "string",
-    #        "text": "string",
-    #    }
-    #).to_csv("./data/processed/metadata_clean_laws_full_titles.csv")
+

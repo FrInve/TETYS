@@ -2,7 +2,7 @@ from bertopic import BERTopic
 import pandas as pd
 from scipy.cluster import hierarchy as sch
 
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/metadata_superclean_laws_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/metadata_superclean_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -10,7 +10,7 @@ DATASET_TEXT_FEATURE = (
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/12_novembre_titoli_articoli/model_0.5677', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/13_novembre_articles/model_0.4172', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 
 print(model.get_topics())
 

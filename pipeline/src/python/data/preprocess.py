@@ -42,7 +42,6 @@ def get_grouped_df_not_ordered(df):
 def get_grouped_df_ordered_only_titles(df):
     df_bis = df.groupby(['l.id']).apply(concatenate_only_titles).reset_index()
     df_bis.columns = ['l.id', 'text']
-    #df_bis = pd.concat([df_bis, df['l.id'].rename("law_id")], axis=1)
     return df_bis
 
 @df_info

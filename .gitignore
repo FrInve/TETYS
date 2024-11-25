@@ -162,3 +162,5 @@ pipeline/src/python/data/processed
 pipeline/src/python/data/interim/embeddings.npy
 pipeline/src/python/visualization/metadata_clean_laws.parquet
 pipeline/src/python/models/tuning
+pipeline/src/python/edit_distance_articoli.csv
+pipeline/src/python/edit_distance.csv
