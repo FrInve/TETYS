@@ -164,3 +164,5 @@ pipeline/src/python/visualization/metadata_clean_laws.parquet
 pipeline/src/python/models/tuning
 pipeline/src/python/edit_distance_articoli.csv
 pipeline/src/python/edit_distance.csv
+pipeline/src/python/0-get_cord.sh
+user.name argij
