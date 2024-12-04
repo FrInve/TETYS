@@ -17,6 +17,7 @@ Topics Evolution That You See (TETYS) is a beneficiary of the NGI Search 2nd Cal
 ---
 
 See [our WIKI page](https://github.com/FrInve/TETYS/wiki) for full documentation.
+Try our most updated dashboard TETYS [here!](http://gmql.eu/tetys).
 
 ---
 
