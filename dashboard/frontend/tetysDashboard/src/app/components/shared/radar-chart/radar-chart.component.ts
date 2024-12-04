@@ -13,7 +13,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 export class RadarChartComponent implements OnDestroy, AfterViewInit, OnChanges {
 
   @Input() chartId: string = '';
-  @Input() chartData: any[] = [];
+  @Input() chartData: { category: string, value: number }[] = [];
   
   private root!: am5.Root;
   private chart!: am5radar.RadarChart;
@@ -21,15 +21,15 @@ export class RadarChartComponent implements OnDestroy, AfterViewInit, OnChanges 
   private xAxis!: am5xy.CategoryAxis<am5radar.AxisRendererCircular>;
   private yAxis!: am5xy.ValueAxis<am5radar.AxisRendererRadial>;
 
-  constructor(private elementRef: ElementRef) { }
-
   ngAfterViewInit(): void {
     this.initChart();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['chartData'] && !changes['chartData'].isFirstChange()) {
-      this.updateChart();
+    if (changes['chartData']) {
+      if (changes['chartData'].currentValue && changes['chartData'].currentValue.length > 0) {
+        this.updateChart();
+      }
     }
   }
 
@@ -39,20 +39,26 @@ export class RadarChartComponent implements OnDestroy, AfterViewInit, OnChanges 
     this.root.setThemes([am5themes_Animated.new(this.root)]);
 
     this.chart = this.root.container.children.push(am5radar.RadarChart.new(this.root, {
-      panX: false,
-      panY: false,
-      wheelX: "panX",
-      wheelY: "zoomX",
+      panX: false,     // Disable panning on X axis
+      panY: false,     // Disable panning on Y axis
+      wheelX: "panX",  // Disable zooming on X axis
+      wheelY: "zoomX",  // Disable zooming on Y axis
     }));
 
     var cursor = this.chart.set("cursor", am5radar.RadarCursor.new(this.root, { }));
     
     cursor.lineY.set("visible", false);
 
-    var xRenderer = am5radar.AxisRendererCircular.new(this.root, {});
-    xRenderer.labels.template.setAll({
-      radius: 10
+    var xRenderer = am5radar.AxisRendererCircular.new(this.root, {
+      minGridDistance: 30
     });
+
+    xRenderer.labels.template.setAll({
+      textType: "adjusted",
+      radius: 10,
+      fontSize: "12px"  // Smaller font size for labels
+    });
+    
 
     this.xAxis = this.chart.xAxes.push(am5xy.CategoryAxis.new(this.root, {
       maxDeviation: 0,
@@ -60,8 +66,13 @@ export class RadarChartComponent implements OnDestroy, AfterViewInit, OnChanges 
       categoryField: "category",
     }));
 
+    const yRenderer = am5radar.AxisRendererRadial.new(this.root, {});
+    yRenderer.labels.template.set("centerX", am5.p50);
+
     this.yAxis = this.chart.yAxes.push(am5xy.ValueAxis.new(this.root, {
-      renderer: am5radar.AxisRendererRadial.new(this.root, {})
+      renderer: yRenderer,
+      maxDeviation: 0.3,
+      min: 0,
     }));
 
     this.series = this.chart.series.push(am5radar.RadarLineSeries.new(this.root, {
@@ -70,8 +81,8 @@ export class RadarChartComponent implements OnDestroy, AfterViewInit, OnChanges 
       yAxis: this.yAxis,
       valueYField: "value",
       categoryXField: "category",
-      tooltip:am5.Tooltip.new(this.root, {
-        labelText:"{valueY}"
+      tooltip: am5.Tooltip.new(this.root, {
+        labelText: "{categoryX}: {valueY}",
       })
     }));
 

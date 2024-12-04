@@ -6,7 +6,7 @@
       hover:bg-primary-skyBlue hover:text-white hover:shadow-md
       text-lg font-bold"    
       [ngClass]="{'bg-primary-darkBlue text-white': isActive('about')}"
-      (click)="setActiveTab('about')"
+      (click)="setActiveTab('about'); router.navigate(['/about'])"
     >
       About
     </button>
@@ -15,7 +15,7 @@
       hover:bg-primary-skyBlue hover:text-white hover:shadow-md
       text-lg font-bold"
       [ngClass]="{'bg-primary-darkBlue text-white': isActive('Dashboards')}"
-      (click)="setActiveTab('Dashboards'); router.navigate(['/'])"
+      (click)="setActiveTab('Dashboards'); router.navigate(['/dashboards'])"
     >
       Dashboards
     </button>

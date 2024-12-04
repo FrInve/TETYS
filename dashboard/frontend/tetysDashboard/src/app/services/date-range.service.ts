@@ -9,16 +9,16 @@ export class DateRangeService {
 
   private startDateElement!: ElementRef;
   private endDateElement!: ElementRef;
-  timeResolution: number = 1
+  timeResolution: string = '1M'
 
   dateRangeChangeSubject = new Subject<{start: Date, end: Date}>();
   dateRangeChange$ = this.dateRangeChangeSubject.asObservable();
 
-  setResolution(newRes: number) {
+  setResolution(newRes: string) {
     this.timeResolution = newRes
   }
 
-  getResolution(): number {
+  getResolution(): string {
     return this.timeResolution
   }
 

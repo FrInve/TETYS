@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../../services/popup-dialog.service'
 import { timeout } from 'rxjs';
@@ -16,6 +16,7 @@ export class PopupDialogComponent implements OnChanges {
   @Input() position?:{ top: string, left: string }; // Position can be overridden
   @Input() extraContentClass = ''
   @Input() closeOnOutsideClick = true; // Optionally close the dialog on outside click
+  @Output() onDialogCloseEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(
     private dialogService: DialogService,
@@ -31,6 +32,7 @@ export class PopupDialogComponent implements OnChanges {
   onOverlayClick(event: MouseEvent) {
     if (this.closeOnOutsideClick) {
       this.dialogService.hidePopup()
+      this.onDialogCloseEvent.emit(true)
     }
   }
 

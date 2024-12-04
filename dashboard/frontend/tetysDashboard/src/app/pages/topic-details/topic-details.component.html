@@ -35,39 +35,34 @@
     <div class="w-11/12 flex flex-col justify-between items-center gap-8 m-auto">
 
         <!-- FIRST SECTION -->
-        <div class="w-full h-fit grid md:grid-cols-2 xs:grid-cols-1 gap-4">
+        <div class="w-full h-fit grid md:grid-cols-2 xs:grid-cols-1 gap-4 min-h-[400px]">
             <div class="flex-grow flex flex-col items-start justify-between
                 bg-white
                 rounded-lg
                 shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]">
                 <div
+                    *ngIf="searchedKeyWord"
                     class="bg-white p-4 w-full
                     border-2 border-primary-grey rounded-lg
                     shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]"
                 >
-                    <span class="text-sm">Keyword:
-                        <span class="font-semibold text-base">Variant</span>
+                    <span  class="text-sm">Keyword:
+                        <span class="font-semibold text-base">{{ searchedKeyWord }}</span>
                     </span>
                 </div>
                 <span class="text-base p-2">Topic:
-                    <span class="font-medium text-lg">Variant</span>
+                    <span class="font-medium text-lg">{{ topicDetails.title || "" }}</span>
                 </span>
-                <span class="text-base p-2">Similarity:
-                    <span class="font-medium text-lg">82%</span>
+                <span *ngIf="similarityScore" class="text-base p-2">Similarity:
+                    <span class="font-medium text-lg">{{ similarityScore }}%</span>
                 </span>
-                <span class="text-base p-2">Published material: 
-                    <span class="font-medium text-lg">20 000 +</span>
+                <span class="text-base p-2">Number of published abstracts: 
+                    <span class="font-medium text-lg">{{ topicDetails.total_documents || "" }}</span>
                 </span>
-                <div class="w-full h-40 p-4">
+                <div class="w-full h-60 p-4">
                     <word-cloud   
                         chartId="singleTopicWC" 
-                        [wordData]="[
-                            { word: 'Angular', frequency: 10 },
-                            { word: 'TypeScript', frequency: 8 },
-                            { word: 'JavaScript', frequency: 6 },
-                            { word: 'Python', frequency: 5 },
-                            { word: 'CSS', frequency: 4 }
-                        ]">
+                        [wordData]="wordCloudData">
                     </word-cloud>
                 </div>
 
@@ -78,7 +73,7 @@
                 bg-white
                 rounded-lg
                 shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)] ">
-                <p class="text-lg p-4 font-semibold">Star diagram</p>
+                <p class="text-lg p-4 font-semibold">Terms' relevance diagram (%)</p>
                 <div class="w-full h-full p-4 pt-0">
                     <radar-chart [chartId]="'radarChart'" [chartData]="radarChartData"></radar-chart>
                 </div>
@@ -98,7 +93,7 @@
                     (click)="selectTab('Tab1')"
                 >
                     Two-intervals comparison
-                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the number published material of the selected topics over a customizable time period."/>
+                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the relative number of published materials for the chosen topics over two customizable time periods."/>
                 </button>
                 <button
                     class="w-1/2 py-2 px-4 text-left text-lg rounded-t-lg font-medium"
@@ -108,15 +103,15 @@
                     (click)="selectTab('Tab2')"
                 >
                     Multi-intervals comparison
-                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the number published material of selected topics over multiple customizable time periods."/>
+                    <hint-tooltip class="ml-3" tooltipTxt="The graph compares the change in the relative number of published materials for the chosen topics over different selectable time periods."/>
 
                 </button>
             </div>
             
             <!-- Tab Content -->
             <div *ngIf="selectedTab === 'Tab1'">
-                <div class="w-full bg-white rounded-lg">
-                    <div class="relative z-10 -mt-1 text-lg font-medium bg-white p-4 flex justify-between">
+                <div class="w-full bg-white rounded-lg -mt-[5px]">
+                    <div class="relative z-10 mt-1 text-lg font-medium bg-white p-4 flex justify-between">
                         Topics temporal trends
                         <div>
                             <label class="text-base" for="countries" >Resolution</label>
@@ -127,10 +122,10 @@
                                 cursor-pointer
                                 border-2 border-primary-skyBlue2 rounded-lg"
                             >
-                                <option class="text-sm" value="1">Daily</option>
-                                <option class="text-sm" value="7">Weekly</option>
-                                <option class="text-sm" value="30">Monthly</option>
-                                <option class="text-sm" value="90">3 months</option>
+                                <option class="text-sm" value="1M">Monthly</option>
+                                <option class="text-sm" value="3M">3 months</option>
+                                <option class="text-sm" value="6M">6 months</option>
+                                <option class="text-sm" value="1Y">Yearly</option>
                             </select>
                         </div>
                     </div>
@@ -153,6 +148,8 @@
                         class="mb-4"
                         [id]="'firstInterval'"
                         (changeRangeNumbers)="handleFirstIntervalChange($event)"
+                        [startDate]="topicDetails.start_date"
+                        [endDate]="topicDetails.end_date"
                         [minRange]="firstRangeStart" 
                         [maxRange]="firstRangeEnd" 
                         color="#9563FF"
@@ -161,6 +158,8 @@
                     <range-slider 
                         [id]="'secondInterval'"
                         (changeRangeNumbers)="handleSecondIntervalChange($event)"
+                        [startDate]="topicDetails.start_date"
+                        [endDate]="topicDetails.end_date"
                         [minRange]="secondRangeStart" 
                         [maxRange]="secondRangeEnd" 
                         color="#EB7100"
@@ -172,7 +171,6 @@
                 <div class="w-full bg-white rounded-lg">
                     <p class="relative z-10 -mt-1 text-lg bg-white font-medium p-4">Topics temporal trends</p>
                     <div class="flex flex-row justify-between items-center text-base px-4">
-                        <span>the periods to compare on the graph</span> 
                         <div>
                             <label class="text-base" for="countries" >Grid resolution</label>
                             <select 
@@ -184,15 +182,18 @@
                                 cursor-pointer
                                 border-2 border-primary-skyBlue2 rounded-lg"
                             >
-                                <option class="text-sm" value="7">Weekly</option>
-                                <option class="text-sm" value="30">Monthly</option>
-                                <option class="text-sm" value="90">3 months</option>
+                                <option class="text-sm" value="1">Monthly</option>
+                                <option class="text-sm" value="3">3 months</option>
+                                <option class="text-sm" value="5">6 months</option>
+                                <option class="text-sm" value="12">Yearly</option>
                             </select>
                         </div>
                     </div>
                     <div class="w-full h-96 p-4 pt-0">
                         <line-chart 
                             chartId="singleTopicChart" 
+                            [startDate]="topicDetails.start_date"
+                            [endDate]="topicDetails.end_date"
                             [chartData]="chartData2" 
                             [hasTag]="false" 
                             [hasGridSelection]="true"
@@ -201,48 +202,99 @@
                     </div>
                 </div>
             </div>
+
+            <div class="p-4 bg-white">
+                <div class="py-2" *ngIf="!testPerformed; else result">
+                    <p *ngIf="this.selectedTab === 'Tab1'" class="text-gray-500">No statistical test has been performed yet. Select the time intervals and click "Run Test" to analyze data.</p>
+                    <p *ngIf="this.selectedTab === 'Tab2'" class="text-gray-500">No statistical test has been performed yet. Select at least two time intervals and click "Run Test" to analyze data.</p>
+                </div>
+                
+                <ng-template #result>
+                    <p class="py-2" 
+                    *ngIf="this.selectedTab === 'Tab1'; else noDifference"
+                    [ngClass]="{
+                        'text-green-600 font-semibold': pValue <= 0.05,
+                        'text-red-600 font-semibold':  pValue > 0.05
+                    }">
+                        p-value: {{ pValue | number:'1.5-5' }}, H-statistic: {{ hStatistic | number:'1.5-5' }} with a p-threshold of 5%, 
+                        the observations in [{{ intervalsInfo.start1 || '' }}, {{ intervalsInfo.end1 || '' }}] <strong>are {{ pValue > 0.05 ? 'not': ''}} statistically different</strong> from the observations in [{{ intervalsInfo.start2 || '' }}, {{ intervalsInfo.end2 || '' }}].
+                    </p>
+                    <ng-template #noDifference>
+                    <p [ngClass]="{
+                        'text-green-600 font-semibold': pValue <= 0.05,
+                        'text-red-600 font-semibold':  pValue > 0.05
+                    }">
+                        p-value: {{ pValue | number:'1.5-5' }}, H-statistic: {{ hStatistic | number:'1.5-5' }} with a p-threshold of 5%, 
+                        <strong>{{ pValue > 0.05 ? 'no': 'one'}} selected interval is statistically different</strong> from the others.
+                    </p>
+                    </ng-template>
+                </ng-template>
+                
+                <button 
+                    [disabled]="!canRunTest"
+                    (click)="runStatisticalTest()" 
+                    class="mt-2 px-4 py-2
+                        disabled:opacity-60
+                        disabled:hover:bg-primary-skyBlue3
+                        text-base
+                        border-2 border-primary-skyBlue2 rounded-full
+                        shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
+                        bg-primary-skyBlue3 hover:bg-primary-skyBlue2"
+                    >
+                    Run test
+                </button>
+            </div>
         </div>
           
         <!-- FOURTH SECTION -->
-        <div class="w-full h-fit bg-primary-lightGrey2 rounded-lg shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15) overflow-hidden mx-4 md:mx-10 mb-4">
-            <table class="w-full table table-bordered">
-                <thead>
-                    <tr class="bg-white">
-                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Title</th>
-                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Authors</th>
-                        <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Date of publication</th>
-                        <th class="w-1/4 py-4 border-b-2 px-6 text-left text-base font-medium">Reference</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white">
-                    <tr>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
-                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
-                    </tr>
-                    <tr>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of Omycron, a new variant of Covid-19</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
-                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
-                    </tr>
-                    <tr>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
-                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
-                    </tr>
-                    <tr>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6 underline">Analysis of a new variant</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Mario Rossi, Carla Bianchi</td>
-                        <td class="border-b-2 border-r-2 text-sm truncate py-4 px-6">Politecnico di Milano</td>
-                        <td class="border-b-2 text-sm truncate py-4 px-6">-</td>
-                    </tr>
-                    <!-- Add more rows here -->
-                </tbody>
-            </table>
+        <div class="w-full h-fit bg-white rounded-lg shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)] overflow-hidden mx-4 md:mx-10 mb-4">
+            <div class="w-full flex flex-row justify-between p-4 pb-0">
+                <p class="text-lg font-semibold">Publications</p>
+                <img 
+                    src="assets/downloadIcon.svg" 
+                    alt="downloadIcon" 
+                    (click)="downloadCSV()"
+                    class="w-5 cursor-pointer"
+                    title="Download data as CSV"
+                />
+            </div>
+
+            <div class="w-full h-full p-4 pt-0">
+                <table class="w-full table table-bordered">
+                    <thead>
+                        <tr class="bg-white">
+                            <th class="border-r-2 border-b-2 w-1/4 py-4 pr-6 text-left text-base font-medium">Title</th>
+                            <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Authors</th>
+                            <th class="border-r-2 border-b-2 w-1/4 py-4 px-6 text-left text-base font-medium">Date of publication</th>
+                            <th class="w-1/4 py-4 border-b-2 px-6 text-left text-base font-medium">Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <tr *ngFor="let doc of docList">
+                            <td class="border-b-2 border-r-2 text-sm py-4 pr-6">"{{ doc.title || '-' }}"</td>
+                            <td class="border-b-2 border-r-2 text-sm py-4 px-6">{{ doc.authors || '-' }}</td>
+                            <td class="border-b-2 border-r-2 text-sm py-4 px-6">{{ doc.date || '-' }}</td>
+                            <td class="border-b-2 text-sm py-4 px-6 text-blue-500 underline"><a target="_blank" [href]="doc.reference">{{ doc.reference || '-' }}</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="flex mt-4">
+                    <button
+                        [disabled]="currentDocListLength == 50"
+                        (click)="currentDocListLength != 50 && loadMore()"
+                        class="h-8 px-5 py-1 m-auto
+                        disabled:opacity-60
+                        disabled:hover:bg-primary-skyBlue3
+                        text-sm
+                        border-2 border-primary-skyBlue2 rounded-full
+                        shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
+                        bg-primary-skyBlue3 hover:bg-primary-skyBlue2">
+                        Load more...
+                    </button>
+                </div>
+            </div>
         </div>
 
     </div>
 </div>
+<app-loading *ngIf="isLoading"></app-loading>

@@ -16,13 +16,12 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
   @Input() color: string = "#00CCB3"
   @Input() minRange: number = 1
   @Input() maxRange: number = 20
+  @Input() startDate?: string
+  @Input() endDate?: string
   @Output() changeRangeNumbers: EventEmitter<{start: Date, end: Date}> 
   = new EventEmitter<{start: Date, end: Date}>();
 
-  minRangeValueGap = 7;
-
-  minPercentage!: number
-  maxPercentage!: number
+  minRangeValueGap = 1;
 
   isDragging = false;
   startX!: number;
@@ -48,19 +47,20 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
     const style = this.renderer.createElement('style');
     style.innerHTML = `
       #${this.id}::-webkit-slider-thumb {
-        height: 18px;
-        width: 18px;
+        height: 12px;
+        width: 12px;
         border: none;
         background-color: ${color};
         pointer-events: auto;
         -webkit-appearance: none;
         cursor: pointer;
         margin-bottom: 1px;
+        border-radius: 50%;
       }
 
       #${this.id}::-moz-range-thumb {
-        height: 14px;
-        width: 14px;
+        height: 12px;
+        width: 12px;
         border: none;
         background-color: ${color};
         pointer-events: auto;
@@ -109,15 +109,30 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
   };
 
   MinVlaueBubbleStyle = () => {
-    let minPercentage = this.minRange;
+    const rangeDiff = this.maxRange - this.minRange;
+
+    // Determine rotation angle based on the range difference
+    const rotation = rangeDiff < 10 ? 'rotate(-20deg)' : 'rotate(0deg)';
+    let minPercentage = rangeDiff < 10 ? this.minRange-3 : this.minRange;
+
+    // Apply both rotation and translation in a single transform statement
     this.minval.nativeElement.style.left = minPercentage + "%";
-    this.minval.nativeElement.style.transform = `translate(-${minPercentage / 2}%, -120%)`;
+    this.minval.nativeElement.style.transform = `
+      translate(-${minPercentage / 2}%, -120%) 
+      ${rotation}`;
   };
 
   MaxVlaueBubbleStyle = () => {
-    this.maxPercentage = 100 - this.maxRange;
-    this.maxval.nativeElement.style.right = this.maxPercentage - 0.5 + "%";
-    this.maxval.nativeElement.style.transform = `translate(${this.maxPercentage / 2}%, -120%)`;
+    const rangeDiff = this.maxRange - this.minRange;
+
+    // Determine rotation angle based on the range difference
+    const rotation = rangeDiff < 10 ? 'rotate(-20deg)' : 'rotate(0deg)';
+    let maxPercentage = rangeDiff < 10 ? 95 - this.maxRange : 100 - this.maxRange;
+
+    this.maxval.nativeElement.style.right = maxPercentage - 0.5 + "%";
+    this.maxval.nativeElement.style.transform = `
+      translate(${maxPercentage / 2}%, -120%)
+      ${rotation}`;
   };
   
   setMinValueOutput = () => {
@@ -127,7 +142,6 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
     .toLocaleDateString(undefined, {    
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
     });
   };
   
@@ -138,19 +152,18 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
     .toLocaleDateString(undefined, {    
       year: 'numeric',
       month: 'short',
-      day: 'numeric',
     });
   };
   
   handleInputChange = (e: Event) => {
     const target = e.target as HTMLInputElement
 
-    this.minRange = parseInt(this.rangeInputStart.nativeElement.value);
-    this.maxRange = parseInt(this.rangeInputEnd.nativeElement.value);
+    this.minRange = parseFloat(this.rangeInputStart.nativeElement.value);
+    this.maxRange = parseFloat(this.rangeInputEnd.nativeElement.value);
 
     this.setMinValueOutput();
     this.setMaxValueOutput();
- 
+
     this.minRangeFill();
     this.maxRangeFill();
  
@@ -205,7 +218,7 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
     // Ensure the element doesn't go outside the left and right boundaries of the parent
     const parentWidth = this.parentElement.nativeElement.offsetWidth;
 
-    let newRangeNum = Math.floor(100*newLeftPosition/parentWidth)
+    let newRangeNum = 100*newLeftPosition/parentWidth
     let rangeLength = Number(this.rangeInputEnd.nativeElement.value) - Number(this.rangeInputStart.nativeElement.value) 
 
     if (newRangeNum < 0) {
@@ -253,11 +266,9 @@ export class RangeSliderComponent implements AfterViewInit, OnChanges, OnInit {
   rangeToDate(value: number): Date {
     // Ensure value is clamped between 0 and 100
     value = Math.max(0, Math.min(100, value));
-  
     // Get the time in milliseconds for both startDate and endDate
-    const startTime = new Date('2024-09-14').setHours(0, 5, 0, 0);
-    const endTime = new Date('2024-12-22').setHours(23, 55, 0, 0);
-  
+    const startTime = new Date(this.startDate!).setHours(0, 5, 0, 0);
+    const endTime = new Date(this.endDate!).setHours(23, 55, 0, 0);
     // Calculate the time difference
     const timeDiff = endTime - startTime;
   
