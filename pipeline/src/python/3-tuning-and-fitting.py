@@ -24,9 +24,9 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_superclean_articles.parquet"
+DATASET_PATH = "./data/processed/13_dicembre/metadata_full_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/13_novembre_articles/"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/15_dicembre_full_titles/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -153,7 +153,7 @@ if __name__ == "__main__":
             best_score = current_score
             best_params = params
             logging.info(f"Found params achieving DBCV score {best_score:.3f}")
-            if best_score >= 0.25:
+            if best_score >= 0.32:
                 ### Fit a model with the best parameters - only if the score is good enough
                 logging.info("Creating a BERTopic model with the best parameters...")
                 # Init a BERTopic model
@@ -174,12 +174,14 @@ if __name__ == "__main__":
                     BEST_MODELS_PATH + f"model_{best_score}.pickle",
                     save_embedding_model=False,
                 )
+
                 topic_model.save(
                     BEST_MODELS_PATH + f"model_{best_score}.safetensors",
                     serialization="safetensors",
                     save_ctfidf=True,
                     save_embedding_model=False,
                 )
+
                 logging.info(f"Best Parameters {best_params}")
                 logging.info(f"DBCV score :{best_score:.3f}")
                 logging.info(f"{pipe.named_steps['hdbscan'].relative_validity_}")

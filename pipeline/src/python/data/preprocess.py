@@ -1,22 +1,32 @@
-#import dask.dataframe as dd
-#import dask.multiprocessing
+import dask.dataframe as dd
+import dask.multiprocessing
 #from langdetect import DetectorFactory, detect
 import pandas as pd
 from pandas import merge, to_datetime
 from utils import df_info
+import spacy
+import regex as re
+import time
 
 #DetectorFactory.seed = 0s
+nlp = spacy.load('it_core_news_sm') 
+nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli', 'attuazione','clausola', 'clausole', 'codice', 'codici',
+                            'comma','commissione', 'commissioni', 'd',
+                            'decreti-legge','decreto', 'decreti', 'decreto-legge','decreto-legislativo','direttiva',
+                            'direttive','disciplina', 'discipline', 'disposizioni',
+                            'disposizione', 'esecuzione','governo', 'governi', 'g','il','italia','italy', 'italiano', 'l', 'legge', 'leggi', 
+                            'legislativo','legislazione', 'legislazioni', 'materia', 'materie',
+                            'ministeriale','misura','misure','modifica','modifiche',
+                            'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'parlamento', 'procedimento','procedimenti', 'procedura',
+                            'provvedimento', 'provvedimenti', 'procedure', 'ratifica', 'ratifiche', 'regolamenti', 
+                            'regolamento','termine', 'termini', 'testi', 'testo',
+                            'vigore',  }
 
 def concatenate_articles_ordered(group):
     # Sort articles by article number
     sorted_group = group.sort_values(by='a.number')
     # Concatenate texts and titles
     concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}: {row['a.text']}" for _, row in sorted_group.iterrows())
-    return pd.Series({'text': concatenated_text})
-
-def concatenate_articles_not_ordered(group):
-    # Concatenate texts and titles
-    concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}: {row['a.text']}" for _, row in group.iterrows())
     return pd.Series({'text': concatenated_text})
 
 def concatenate_only_titles(group):
@@ -26,16 +36,19 @@ def concatenate_only_titles(group):
     concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}" for _, row in sorted_group.iterrows())
     return pd.Series({'text': concatenated_text})
 
-@df_info
-def get_grouped_df_ordered(df):
-    df = df.groupby(['l.id']).apply(concatenate_articles_ordered).reset_index()
-    df.columns = ['law_id', 'text']
+def remove_digits_stopwords_apostrophes_convert_lowercase(df):
+    # convert to lowercase
+    df['text'] = df['text'].apply(lambda x: x.lower())
+    # remove digits
+    df['text'] = df['text'].apply(lambda x:  re.sub("\d+|'", " ", x))
+    # remove stopwords
+    df['text'] = df['text'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
     return df
 
 @df_info
-def get_grouped_df_not_ordered(df):
-    df = df.groupby(['l.id']).apply(concatenate_articles_not_ordered).reset_index()
-    df.columns = ['law_id', 'text']
+def get_grouped_df_ordered(df):
+    df = df.groupby(['l.id']).apply(concatenate_articles_ordered).reset_index()
+    df.columns = ['l.id', 'text']
     return df
 
 @df_info
@@ -51,7 +64,17 @@ def remove_nas(df):
     ]
     return df
 
-"""""
+@df_info
+def clean_text_dask(df):
+    dask_dataframe = dd.from_pandas(df, npartitions=8)
+    t0 = time.time()
+    result = dask_dataframe.map_partitions(remove_digits_stopwords_apostrophes_convert_lowercase, meta=df)
+    df = result.compute()
+    t1 = time.time()
+    print("Time to process with Dask {}".format(t1-t0))
+    return df
+
+""""
 @df_info
 def remove_nas(df):
     df = df[

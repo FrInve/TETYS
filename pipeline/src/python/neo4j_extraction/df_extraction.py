@@ -10,7 +10,7 @@ def giveMeDataLawsFull():
 
 def giveMeDataLawsTitles():
     # Extract laws from 2016 to today, create dataframe ID-Title
-    df = driver.run_cypher("""  MATCH (l:Article)<-[:HAS_ARTICLE]-(a:Law) WHERE a.publicationDate > datetime("2015") RETURN l.id AS article_id, l.title AS text, a.id as law_id """)
+    df = driver.run_cypher("""  MATCH (l:Article)<-[:HAS_ARTICLE]-(a:Law) WHERE a.publicationDate > datetime("2015") RETURN l.id AS article_id, l.title AS text, a.id as law_id, a.title as law_title """)
     return df
 
 

@@ -1,4 +1,5 @@
 bertopic==0.16.3
+dask
 huggingface-hub
 matplotlib 
 matplotlib-inline 
@@ -11,6 +12,7 @@ pyarrow
 pydantic
 python-dateutil 
 PyYAML 
+regex
 requests 
 scikit-learn
 scipy
@@ -19,6 +21,7 @@ sentence-transformers
 six 
 sniffio 
 soupsieve 
+spacy
 statsmodels==0.14.0
 tokenizers
 torch

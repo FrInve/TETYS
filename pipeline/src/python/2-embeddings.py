@@ -13,7 +13,7 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "./data/processed/metadata_superclean_articles.parquet"
+DATASET_PATH = "./data/processed/13_dicembre/metadata_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )

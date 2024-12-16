@@ -21,6 +21,7 @@ documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
 model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/13_novembre_full_titles/model_0.4132', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = model.get_document_info(documents)
+#document_topics.to_csv("model_topics.csv")
 document_topics = pd.concat([document_topics, df['l.id'].rename("law_id")], axis=1)
 document_topics = document_topics[['law_id', 'Top_n_words']]
 #remove digits
@@ -45,6 +46,9 @@ df_lev.rename(columns={'topics': 'topics_andrea'}, inplace=True)
 # now we need to split some strings
 df_lev['topics_model'] = df_lev['topics_model'].apply(lambda x: x.split('-'))
 df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x: x.split(';'))
+
+# Split on bigrams and trigrams
+df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x: x.split(' '))
 
 avg_edit_dist = []
 
