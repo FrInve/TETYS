@@ -31,7 +31,7 @@ class Documents:
             lambda x: Document(
                 id=x[self.col_id] if self.col_id else "",
                 title=x[self.col_title] if self.col_title else "",
-                date=str(x[self.col_date]) if self.col_date else "",
+                date=str(x[self.col_date].year) if self.col_date else "",
                 content=x[self.col_content] if self.col_content else "",
                 authors=x[self.col_authors] if self.col_authors else "",
                 reference=x[self.col_reference] if self.col_reference else "",
