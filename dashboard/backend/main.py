@@ -158,6 +158,13 @@ async def read_topic(
             topic_id, resolution, start_date, end_date
         )
 
+        try:
+            first_date_topic = project.data.get_first_topic_date(topic_id)
+            last_date_topic = project.data.get_last_topic_date(topic_id)
+        except:
+            first_date_topic = ""
+            last_date_topic = ""
+
         topic = Topic(
             id=topic_id,
             title=", ".join([term[0].capitalize() for term in terms[:3]]),
@@ -169,6 +176,10 @@ async def read_topic(
             absolute_frequencies=time_series[0],
             relative_frequencies=time_series[1],
             rankings=time_series[2],
+            first_date_topic=first_date_topic,
+            last_date_topic=last_date_topic,
+            first_date_project=project.time_series.get_starting_date(),
+            last_date_project=project.time_series.get_ending_date(),
         )
         return topic
     except KeyError:

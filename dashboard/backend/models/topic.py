@@ -15,6 +15,10 @@ class Topic(BaseModel):
     absolute_frequencies: List[int]
     relative_frequencies: List[float]
     rankings: List[int]
+    first_date_topic: str
+    last_date_topic: str
+    first_date_project: str
+    last_date_project: str
 
 
 class TimeSeriesHolder:

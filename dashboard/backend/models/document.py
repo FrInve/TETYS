@@ -44,6 +44,20 @@ class Documents:
         )
         return res
 
+    def get_first_topic_date(self, topic_id: int) -> str:
+        self.con.execute(
+            f"SELECT strftime(MIN({self.col_date}), '%x') FROM read_parquet('{self.data_path}') WHERE topic = {topic_id};"
+        )
+        res = self.con.df()
+        return res.iloc[0, 0]
+
+    def get_last_topic_date(self, topic_id: int) -> str:
+        self.con.execute(
+            f"SELECT strftime(MAX({self.col_date}), '%x') FROM read_parquet('{self.data_path}') WHERE topic = {topic_id};"
+        )
+        res = self.con.df()
+        return res.iloc[0, 0]
+
     def set_column_names(
         self, id, title, date, content, authors, reference, url, num_of_citations
     ):
