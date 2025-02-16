@@ -17,8 +17,10 @@ import { DateRangeService } from '../../../services/date-range.service'
 export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
   
   @Input() chartId: string = '';
-  @Input() chartData: { data: any[], name: string }[] = [];
-  @Input() timeResolution: number = 1;
+  @Input() chartData: { data: any[], id: string }[] = [];
+  @Input() timeResolution: string = '1M';
+  @Input() startDate?: string;
+  @Input() endDate?: string;
   @Input() hasTag: boolean = true;
 
   @Input() hasTwoInterval: boolean = false;
@@ -54,7 +56,6 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['chartData'] && !changes['chartData'].isFirstChange()) {
-      console.log("HAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", changes['chartData'].currentValue)
       this.updateChart();
     }
 
@@ -100,7 +101,9 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
           range.dispose();
         });
 
-        this.addGridColumns(new Date('2024-09-14'), new Date('2024-12-22'), this.gridResolution);  // 1 week intervals
+        this.selectedRanges = []
+
+        this.addGridColumns(this.startDate!, this.endDate!, this.gridResolution);  // 1 week intervals
       }
     }
   }
@@ -109,6 +112,32 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
     return (this.chart?.series.values as am5xy.LineSeries[] || [])
   }
 
+  extractValueAndUnit(): { unit: am5.time.TimeUnit, value: number } {
+    // Extract the last character of the string (unit)
+    const unitChar = this.timeResolution.slice(-1).toLowerCase();
+    
+    // Extract the number (everything except the last character)
+    const value = parseInt(this.timeResolution.slice(0, -1), 10);
+  
+    // Determine the unit based on the last character
+    let unit: am5.time.TimeUnit = 'month';
+    switch (unitChar) {
+      case 'd':
+        unit = 'day';
+        break;
+      case 'm':
+        unit = 'month';
+        break;
+      case 'y':
+        unit = 'year';
+        break;
+      default:
+        throw new Error('Invalid unit. Only "d", "m", and "y" are allowed.');
+    }
+  
+    return { unit, value };
+  }
+  
   private initChart() {
     this.root = am5.Root.new(this.chartId);
 
@@ -136,19 +165,18 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
     // Create DateAxis (X Axis)
     this.dateAxis = this.chart.xAxes.push(am5xy.DateAxis.new(this.root, {
       maxDeviation: 0,
-      baseInterval: { timeUnit: "day", count: this.timeResolution }, //time resolution
+      baseInterval: { 
+        timeUnit: this.extractValueAndUnit().unit, 
+        count: this.extractValueAndUnit().value
+      }, //time resolution
       renderer: am5xy.AxisRendererX.new(this.root, {
         minorGridEnabled: true,
         minGridDistance: 200,    
         minorLabelsEnabled: true
       }),
-      tooltip: am5.Tooltip.new(this.root, {})
+      tooltip: am5.Tooltip.new(this.root, {}),
     }));
 
-    this.dateAxis.set("minorDateFormats", {
-      day: "dd",
-      month: "MM"
-    });
     // Remove grid lines from X Axis
     this.dateAxis.get("renderer").grid.template.setAll({
       strokeOpacity: 0
@@ -164,6 +192,16 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
       renderer: am5xy.AxisRendererY.new(this.root, {})
     }));
 
+    // Add vertical label to value axis
+    this.valueAxis.children.unshift(
+      am5.Label.new(this.root, {
+        text: "Relative frequency (%)",
+        rotation: -90,  // Rotate the label to make it vertical
+        y: am5.p50,     // Center the label on the Y axis
+        centerX: am5.p50,
+        fontSize: '0.7rem'
+      })
+    );
     // Add cursor
     this.addCursorInteraction()
 
@@ -188,7 +226,7 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
       // Create a series for each data set
       this.chartData.forEach((dataSet, index) => {
         const series = this.chart.series.push(am5xy.LineSeries.new(this.root, {
-          name: dataSet.name || `Series ${index + 1}`,
+          name:`Topic ${index + 1}`,
           xAxis: this.dateAxis,
           yAxis: this.valueAxis,
           valueYField: 'value',
@@ -224,6 +262,12 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
   }
 
   private addScrollBar() {
+
+    // Check if there is an existing scrollbar and dispose of it
+    if (this.chart.get("scrollbarX")) {
+      this.chart.get("scrollbarX")!.dispose();
+    }
+      
     //Add scrollbar
     this.chart.set("scrollbarX", am5.Scrollbar.new(this.root, {
       orientation: "horizontal",
@@ -334,56 +378,66 @@ export class LineChartComponent implements OnDestroy, AfterViewInit, OnChanges {
     }
 
     if (this.hasGridSelection) {
-      this.addGridColumns(new Date('2024-09-14'), new Date('2024-12-22'), this.gridResolution);  // 1 week intervals
+      this.addGridColumns(this.startDate!, this.endDate!, this.gridResolution);  // 1 week intervals
     }
 
   }
 
-  private addGridColumns(startDate: Date, endDate: Date, daysInterval: number) {
-    let currentDate = startDate.getTime();
-    const endDateTime = endDate.getTime();
+  private addGridColumns(startDate: string, endDate: string, monthsInterval: number) {
+    let currentDateVar = new Date(startDate)
+    let endDateTimeVar = new Date(endDate)
+    // Adjust start date to the first day of the month at midnight
+    let currentDate = new Date(currentDateVar.getFullYear(), currentDateVar.getMonth(), 1).getTime();
 
+    // Adjust end date to the last day of the month at 23:59:59
+    const endDateTime = new Date(endDateTimeVar.getFullYear(), endDateTimeVar.getMonth() + 1, 0, 23, 59, 59).getTime();
+  
     while (currentDate < endDateTime) {
-      if(endDateTime - currentDate < 7 * 24 * 60 * 60 * 1000) break 
-      const nextDate = new Date(currentDate + daysInterval * 24 * 60 * 60 * 1000);
-
+      const currentStartDate = new Date(currentDate);
+      
+      // If there's less than a month remaining, break the loop
+      if (endDateTime - currentDate < 30 * 24 * 60 * 59 * 1000) break;
+  
+      // Create a new date, adding the months interval
+      const nextDate = new Date(currentStartDate);
+      nextDate.setMonth(currentStartDate.getMonth() + monthsInterval);
+  
       let rangeItem = this.dateAxis.createAxisRange(this.dateAxis.makeDataItem({}));
-      rangeItem.set("value", currentDate);
+      rangeItem.set("value", currentStartDate.getTime());
       rangeItem.set("endValue", nextDate.getTime());
-
+  
+      // Setting up grid visuals
       rangeItem.get("grid")?.setAll({
         strokeOpacity: 1,
         stroke: am5.color("#6794dc")
       });
-
+  
       let axisFill = rangeItem.get("axisFill");
       axisFill?.setAll({
         fillOpacity: 0.15,
         fill: am5.color("#ffffff"),
-        visible:true,
-        interactive: true, // Enable interactions
-        cursorOverStyle: "pointer" // Set cursor to pointer on hover
+        visible: true,
+        interactive: true,
+        cursorOverStyle: "pointer"
       });
-
-      axisFill?.events.on("click", () => this.toggleSelection(axisFill!, new Date(currentDate), nextDate));
-
-      // Change color on hover
+  
+      // Handle interactions: toggle selection, hover color changes
+      axisFill?.events.on("click", () => this.toggleSelection(axisFill!, new Date(currentStartDate), nextDate));
       axisFill?.events.on("pointerover", () => {
         axisFill?.set("fill", am5.color("#FFCC00"));  // Hover color
       });
-
-      // Reset color when mouse leaves
       axisFill?.events.on("pointerout", () => {
         const isSelected = this.selectedRanges.some(
-          (range) => range.start.getTime() === currentDate && range.end.getTime() === nextDate.getTime()
+          (range) => range.start.getTime() === currentStartDate.getTime() && range.end.getTime() === nextDate.getTime()
         );
         axisFill?.set("fill", am5.color(isSelected ? "#EB7100" : "#ffffff")); // Selected color or default color
       });
-
+  
+      // Move to the next interval (increment monthsInterval)
       currentDate = nextDate.getTime();
     }
   }
-
+  
   private toggleSelection(gridRect: am5.Graphics, start: Date, end: Date) {
     const isSelected = this.isRangeSelected(start.getTime(), end.getTime());
 

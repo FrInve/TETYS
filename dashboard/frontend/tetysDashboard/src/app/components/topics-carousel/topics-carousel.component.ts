@@ -50,7 +50,7 @@ export class TopicsCarouselComponent implements OnInit, OnDestroy {
   startAutoSlide() {
     this.intervalId = setInterval(() => {
       this.next();
-    }, 3000); // Slide every 3 seconds
+    }, 9000); // Slide every 3 seconds
   }
 
   next() {

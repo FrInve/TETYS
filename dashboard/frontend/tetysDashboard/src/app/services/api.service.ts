@@ -9,7 +9,7 @@ import { catchError } from 'rxjs/operators';
 })
 
 export class ApiService {
-  private baseUrl = 'tetys_api';  // Replace with your backend URL
+  private baseUrl = 'https://geco.deib.polimi.it/tetys_api';  // Replace with your backend URL
 
   constructor(private http: HttpClient) {}
 
@@ -26,6 +26,23 @@ export class ApiService {
     }
     
     return this.http.get(url, { params }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  // Example method to post data to an endpoint
+  postData(endpoint: string, body: any, paramsObj?: any): Observable<any> {
+    const url = `${this.baseUrl}/${endpoint}`;
+    let params = new HttpParams();
+
+    // If there are parameters, append them to HttpParams
+    if (paramsObj) {
+      Object.keys(paramsObj).forEach((key) => {
+        params = params.append(key, paramsObj[key]);
+      });
+    }
+    
+    return this.http.post(url, body, { params }).pipe(
       catchError(this.handleError)
     );
   }

@@ -34,26 +34,25 @@ import { debounceTime } from 'rxjs/operators';
 
 export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
   private inputSubject: Subject<{ value: string, index: number }> = new Subject();
-
-  @ViewChild('inputElement') inputElement!: ElementRef;
-
+  
   searchTerm: string = ''
   mainArea: string = ''
   projectId = ''
 
   dialogPosition!: { top: string, left: string }
 
-  selectedTopicsId: Set<string> = new Set()
+  selectedTopicsId: Set<number> = new Set()
   allowedTopicsNum = 5
   focusedInputIndex = 0
   searchHistory: {
-    searchedTerm: '',
-    selectedTopics: TopicDataModel[]
+    searchedTerm: string,
+    selectedTopics: TopicDataModel[],
+    allTopics: TopicDataModel[],
   }[] = [{
     searchedTerm: '',
-    selectedTopics: []
+    selectedTopics: [],
+    allTopics: []
   }]
-  allTopics: TopicDataModel[][] = []
   chartData: any[] = []
   isLoading = false;
 
@@ -100,8 +99,8 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
   }
 
   get canDialogClosed(): boolean {
-    return (this.searchHistory[this.focusedInputIndex] ? 
-    this.searchHistory[this.focusedInputIndex].selectedTopics.length !== 0
+    return (this.searchHistory[0] ? 
+    this.searchHistory[0].selectedTopics.length !== 0
     : false)
   }
   
@@ -138,7 +137,7 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
       this.projectId = params['area'];
       this.searchHistory[0].searchedTerm = params['searchTerm'] 
     });
-    this.chartData = [] //TODO: Fake data for line charts
+    this.chartData = []
 
     this.getSearchedTopics(this.searchTerm, 0)
   }
@@ -152,6 +151,7 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
         top: `${top + 8}px`, //8px gap
         left: `${left}px`
       }
+      
       // Manually trigger change detection after updating dialogPosition
       this.cdr.detectChanges();
 
@@ -159,12 +159,12 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
     }
   }
 
-  get timeResolution(): number {
+  get timeResolution(): string {
     return this.dateRangeService.getResolution()
   }
 
   get getData() {
-    return this.allTopics[this.focusedInputIndex]
+    return this.searchHistory[this.focusedInputIndex].allTopics
   }
 
   get getRemainingTopicsNum(): number {
@@ -178,7 +178,8 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
       keywords: searchedTerm
     }).subscribe({
       next: (res) => {
-        this.allTopics[index] = res
+        this.searchHistory[index].allTopics = res
+        this.searchHistory[index].searchedTerm = searchedTerm
       },
       complete: () => {
         this.isLoading = false
@@ -220,49 +221,64 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
     this.showTopicList()
   }
 
-  handleTopicSelect = (obj: any, searchInputIndex: number) => {
+  handleTopicSelect = (obj: any, searchInputIndex: number, forceDelete: boolean = false) => {
+
     if (this.selectedTopicsId.has(obj.id)) {
       this.selectedTopicsId.delete(obj.id)
-      this.searchHistory[searchInputIndex].selectedTopics = this.searchHistory[searchInputIndex].selectedTopics.filter((item) => {
-        return this.selectedTopicsId.has(item.id.toString())
+      this.searchHistory = this.searchHistory.map(historyItem => ({
+        ...historyItem, // Keep the rest of the properties in historyItem
+        selectedTopics: historyItem.selectedTopics.filter(topic => 
+          this.selectedTopicsId.has(topic.id) // Keep only topics whose id is in the set
+        )
+      }));
+      //Remove elements without selected topic
+      this.searchHistory = this.searchHistory.filter((sh, index) => {
+        if(forceDelete || index !== searchInputIndex) {
+          return sh.selectedTopics.length !== 0
+        } else {
+          return sh
+        }
       })
-      //TODO: should be deleted based on ID
+      this.focusedInputIndex = this.searchHistory.length - 1 //adjust index after deleting an input
+
       this.chartData = this.chartData.filter((d) => {
-        return d.id !== obj.id.toString()
+        return d.id !== obj.id
       })
     }else {
       if (this.selectedTopicsId.size < this.allowedTopicsNum) {
         this.selectedTopicsId.add(obj.id)
         this.searchHistory[searchInputIndex].selectedTopics.push(obj)
-        var relativeFreq: number[] = []
+        var mappedData: any[] = []
+        this.isLoading = true
         this.apiService.getData(
           `/topic/${obj.id}`, 
           {
-            project_id: this.projectId
+            project_id: this.projectId,
+            resolution: this.timeResolution
           }
         ).subscribe({
           next: (topicData) => {
-            relativeFreq = topicData['relative_frequencies']
+            console.log("topicData", topicData)
+            mappedData = this.mapValuesToTimeResolution(
+              topicData['relative_frequencies'], 
+              topicData['start_date'], 
+              topicData['end_date']
+            );
           },
           complete: () => {
             this.chartData = [
               ...this.chartData,
               {
                 id: obj.id,
-                data: relativeFreq
+                data: mappedData
               }
             ]
+            this.isLoading = false
           }
         })
 
       }
     }
-
-    //Remove elements without selected topic
-    this.searchHistory = this.searchHistory.filter((sh) => {
-      return sh.selectedTopics.length !== 0
-    })
-    this.focusedInputIndex = this.searchHistory.length - 1 //adjust index after deleting an input
 
     //When searches are empty then close the topic list dialog
     if (this.searchHistory.length === 0) {
@@ -271,43 +287,84 @@ export class TopicsComparisonComponent implements OnInit, AfterViewInit  {
   }
 
   addSearchInput = () => {
-    console.log(this.searchHistory, this.focusedInputIndex)
     this.searchHistory.push({
       searchedTerm: '',
-      selectedTopics: []
+      selectedTopics: [],
+      allTopics: []
     })
     this.focusedInputIndex++
     this.showTopicList()
-  }
 
-  timeResolutionChange = (e: Event) => {
-    const inputValue = (e.target as HTMLInputElement).value;
-    this.dateRangeService.setResolution(parseInt(inputValue))
-    this.chartData = this.chartData.map((data) => {
-      return {
-        id: data.id,
-        data: this.generateDatas(100/parseInt(inputValue), parseInt(inputValue))
+    setTimeout(() => {
+      // Ensure input is focused after it's added to the DOM
+      const lastAddedInputEl = document.getElementById('searchInput_' + this.focusedInputIndex.toString())
+      if (lastAddedInputEl) {
+        lastAddedInputEl.focus();
       }
     })
   }
 
-  //To Generate Fake data for the line chart
-  generateDatas(count: number, timeResultion: number = 1) {
-    let data = [];
-    for (var i = 0; i < count; ++i) {
-      let value = 100;
-      value = Math.round((Math.random() * 10 - 5) + value); // Adjust the value randomly
+  handleDialogClose = (e: boolean) => {
+    this.searchHistory = this.searchHistory.filter((sh) => {
+      return sh.selectedTopics.length !== 0
+    })
+    this.focusedInputIndex = this.searchHistory.length - 1
+  }
 
-      let date = new Date('2024-09-14');
-      date.setHours(23, 59, 0, 0); // Set time to 23:59:00
-      date.setDate(date.getDate() + i*timeResultion); // Increment the date by one day by default
+  timeResolutionChange = (e: Event) => {
+    const inputValue = (e.target as HTMLInputElement).value;
+    this.dateRangeService.setResolution(inputValue)
 
-      data.push({
-        date: date.getTime(), // Get the timestamp
-        value: value
-      });
+    var mappedData: any[] = []
+    this.selectedTopicsId.forEach((tId: number) => {
+      this.apiService.getData(
+        `/topic/${tId}`, 
+        {
+          project_id: this.projectId,
+          resolution: inputValue
+        }
+      ).subscribe({
+        next: (topicData) => {
+          mappedData = this.mapValuesToTimeResolution(
+            topicData['relative_frequencies'], 
+            topicData['start_date'], 
+            topicData['end_date']
+          );
+        },
+        complete: () => {
+          this.chartData = this.chartData.map((data) => {
+            if(data.id === tId) {
+              return {
+                id: tId,
+                data: mappedData
+              }
+            }
+            return data
+          })
+        }
+      })
+    })
+
+  }
+
+  mapValuesToTimeResolution(
+    values: number[], 
+    startDate: Date, 
+    endDate: Date
+  ): { date: number, value: number }[] {
+    const result: { date: number, value: number }[] = [];
+    const totalMS = new Date(endDate).getTime() - new Date(startDate).getTime()
+    const intervalMS = totalMS / (values.length - 1); 
+    
+    let currentDate = new Date(startDate).getTime();
+  
+    for (let i = 0; i < values.length; i++) {
+      result.push({ date: currentDate, value: 100*values[i] });
+  
+      currentDate = currentDate + intervalMS; // Adjust date based on calculated interval
     }
-    return data;
+    console.log(result)
+    return result;
   }
 
 }

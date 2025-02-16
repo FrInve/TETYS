@@ -1,8 +1,8 @@
-<div class="flex flex-col justify-around items-center">
+<div class="flex flex-col justify-between items-center h-full">
     <div class="w-full flex flex-col justify-center items-center">
         <div class="w-full flex flex-row justify-between items-start">
             <span class="underline text-xs">Topic: 
-                <span class="font-semibold text-sm">{{ topicObj.title }}</span>
+                <span (click)="navigateToTopicDetail()" class="font-semibold text-sm cursor-pointer hover:opacity-60">{{ topicObj.title }}</span>
             </span>
             <div *ngIf="!selectable">
                 <!-- <span class="text-xs" *ngIf="topicObj.rank === 1">{{ topicObj.rank }}st</span>
@@ -14,7 +14,7 @@
                         [disabled]="disabledSelect"
                         type="checkbox" 
                         class="w-4 h-4 accent-green-600" 
-                        [checked]="selectedIds.has(topicObj.id.toString())"
+                        [checked]="selectedIds.has(topicObj.id)"
                     />
                 </label>
             </div>

@@ -22,15 +22,18 @@
                     shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
                     focus:shadow focus:outline-none"
                 />
-
                 <div class="flex flex-row justify-around">
                     <topic-card
                         *ngFor="let selectedTopic of searchObj.selectedTopics; index as j"
                         class="min-h-64 w-full bg-white rounded-lg border-2 p-4 mt-4 mb-2 mx-2"
+                        [extraQuery]="{
+                            key: 'searchedKeyWord',
+                            value: searchHistory[focusedInputIndex].searchedTerm
+                        }"
                         [style.borderColor]="getBorderColor(i, j)"
                         [selectable]="true"
                         [selectedIds]="selectedTopicsId"
-                        (checkboxClick)="handleTopicSelect($event, i)"
+                        (checkboxClick)="handleTopicSelect($event, i, true)"
                         [topicObj]="selectedTopic" 
                         [wordCloudId]="i + '_selected_' + j" 
                     />
@@ -72,10 +75,10 @@
                         cursor-pointer
                         border-2 border-primary-skyBlue2 rounded-lg"
                     >
-                        <option class="text-sm" value="1">Daily</option>
-                        <option class="text-sm" value="7">Weekly</option>
-                        <option class="text-sm" value="30">Monthly</option>
-                        <option class="text-sm" value="90">3 months</option>
+                        <option class="text-sm" value="1M">Monthly</option>
+                        <option class="text-sm" value="3M">3 months</option>
+                        <option class="text-sm" value="6M">6 months</option>
+                        <option class="text-sm" value="1Y">Yearly</option>
                     </select>
                 </div>
             </div>
@@ -90,15 +93,20 @@
 
 <popup-dialog 
     *ngIf="isPopupOpen"
+    (onDialogCloseEvent)="handleDialogClose($event)"
     [closeOnOutsideClick]="canDialogClosed" 
     [position]="dialogPosition" 
     extraContentClass="w-11/12 bg-primary-lightGrey"
 >
     <div class="grid max-h-[50vh] overflow-y-auto lg:grid-cols-5 md:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 gap-4">
         <topic-card
-            *ngFor="let item of allTopics[focusedInputIndex]; index as i"
+            *ngFor="let item of searchHistory[focusedInputIndex].allTopics; index as i"
             class="w-full bg-white rounded-lg p-4"
-            [disabledSelect]="selectedTopicsId.size === allowedTopicsNum"
+            [extraQuery]="{
+                key: 'searchedKeyWord',
+                value: searchHistory[focusedInputIndex].searchedTerm
+            }"
+            [disabledSelect]="(selectedTopicsId.size === allowedTopicsNum && !selectedTopicsId.has(item.id))"
             [selectable]="true"
             [selectedIds]="selectedTopicsId"
             (checkboxClick)="handleTopicSelect($event, focusedInputIndex)"
@@ -107,10 +115,13 @@
             [hasSimilarityScore]="true"
         />
     </div>
+    <p class="font-semibold text-gray-600 text-center p-5" *ngIf="searchHistory[focusedInputIndex].allTopics.length === 0">Insert a keyword or a DOI to see the corresponding topics.</p>
 
     <div class="flex flex-row justify-between items-center mt-4">
-        <span class="text-base">Select up to {{ getRemainingTopicsNum }} topics to make a comparison</span>
+
+        <p class="text-base">Select up to {{ getRemainingTopicsNum }} topics to make a comparison</p>
         <button
+            *ngIf="searchHistory[focusedInputIndex].allTopics.length !== 0"
             [disabled]="!canDialogClosed"
             (click)="hideTopicList()"
             class="h-9 px-5 pb-1
@@ -120,9 +131,8 @@
             border-2 border-primary-skyBlue2 rounded-full
             shadow-[1px_1px_10px_2px_rgba(0,0,0,0.15)]
             bg-primary-skyBlue3 hover:bg-primary-skyBlue2">
-            <span>compare</span>
+            <span>Compare</span>
         </button>
     </div>
 </popup-dialog>
-
 <app-loading *ngIf="isLoading"></app-loading>

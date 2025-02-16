@@ -21,7 +21,7 @@ export class WordCloudComponent implements AfterViewInit, OnChanges, OnDestroy {
     // Delay the initialization to ensure the DOM element is available
     setTimeout(() => {
       this.initChart();
-    }, 0);
+    }, 500);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
