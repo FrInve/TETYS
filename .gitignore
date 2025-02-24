@@ -165,4 +165,7 @@ pipeline/src/python/models/tuning
 pipeline/src/python/edit_distance_articoli.csv
 pipeline/src/python/edit_distance.csv
 pipeline/src/python/0-get_cord.sh
+pipeline/src/python/comparison/word2vec/18_dicembre/cosine_sim_max.csv
+pipeline/src/python/comparison/word2vec/18_dicembre/cosine_sim.csv
+pipeline/src/python/comparison/word2vec/18_dicembre/model_topics.csv
 user.name argij

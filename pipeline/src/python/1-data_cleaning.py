@@ -20,7 +20,7 @@ if __name__ == "__main__":
     #Uncomment if yo are using only the titles (both laws and articles)
     df_clean = (
         df.pipe(prep.start_pipeline)
-        .pipe(prep.get_grouped_df_ordered)
+        .pipe(prep.get_grouped_df_ordered_only_titles)
     )
 
     with dask.config.set(scheduler="processes", num_workers=8):
@@ -55,7 +55,7 @@ if __name__ == "__main__":
             "text": "string",
             "l.id": "string",
         }
-    ).to_parquet("./data/processed/16_dicembre/metadata_full_text.parquet")
+    ).to_parquet("./data/processed/16_dicembre/metadata_full_titles.parquet")
 
     print(df_clean_2.head())
     print(df_clean_2.shape)
@@ -65,6 +65,6 @@ if __name__ == "__main__":
             "text": "string",
             "l.id": "string",
         }
-    ).to_csv("./data/processed/16_dicembre/metadata_full_text.csv")
+    ).to_csv("./data/processed/16_dicembre/metadata_full_titles.csv")
 
 

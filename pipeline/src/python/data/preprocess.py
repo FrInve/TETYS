@@ -20,7 +20,7 @@ nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli',
                             'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'parlamento', 'procedimento','procedimenti', 'procedura',
                             'provvedimento', 'provvedimenti', 'procedure', 'ratifica', 'ratifiche', 'regolamenti', 
                             'regolamento','termine', 'termini', 'testi', 'testo',
-                            'vigore',  }
+                            'vigore', }
 
 def concatenate_articles_ordered(group):
     # Sort articles by article number
@@ -36,11 +36,13 @@ def concatenate_only_titles(group):
     concatenated_text = ' '.join(f"{row['l.title']}: {row['a.title']}" for _, row in sorted_group.iterrows())
     return pd.Series({'text': concatenated_text})
 
-def remove_digits_stopwords_apostrophes_convert_lowercase(df):
+def remove_digits_stopwords_punctuation_convert_lowercase(df):
     # convert to lowercase
     df['text'] = df['text'].apply(lambda x: x.lower())
-    # remove digits
+    # remove digits and apostrophes
     df['text'] = df['text'].apply(lambda x:  re.sub("\d+|'", " ", x))
+    # remove all punctuation
+    # df['text'] = df['text'].apply(lambda x:  re.sub("[^\w\s]", " ", x))
     # remove stopwords
     df['text'] = df['text'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
     return df
@@ -68,7 +70,7 @@ def remove_nas(df):
 def clean_text_dask(df):
     dask_dataframe = dd.from_pandas(df, npartitions=8)
     t0 = time.time()
-    result = dask_dataframe.map_partitions(remove_digits_stopwords_apostrophes_convert_lowercase, meta=df)
+    result = dask_dataframe.map_partitions(remove_digits_stopwords_punctuation_convert_lowercase, meta=df)
     df = result.compute()
     t1 = time.time()
     print("Time to process with Dask {}".format(t1-t0))

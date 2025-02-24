@@ -1,5 +1,5 @@
 import pandas as pd
-import fasttext
+from gensim.models import Word2Vec
 import nltk
 import tempfile
 #nltk.download('punkt_tab')
@@ -9,16 +9,20 @@ MODEL_PATH = '/home/telese/TETYS/pipeline/src/python/models/word2vec'
 
 
 if __name__ == "__main__":
-    data = pd.read_csv('/home/telese/TETYS/pipeline/src/python/data/processed/16_dicembre/metadata_full_text.csv')
+    #data = pd.read_csv('/home/telese/TETYS/pipeline/src/python/data/processed/16_dicembre/metadata_full_text.csv')
     # tokenize dataset
-    data['text'] = data['text'].apply(lambda x: nltk.word_tokenize(x))
+    #data['text'] = data['text'].apply(lambda x: nltk.word_tokenize(x))
 
-    texts = data.text.tolist()
+    #texts = data.text.tolist()
     # fit model
-    model = fasttext.train_unsupervised(texts)
+    #model = Word2Vec(texts)
     # save model
 
-    with tempfile.NamedTemporaryFile(prefix='saved_model_gensim-', delete=False) as tmp:
-        model.save(tmp.name, separately=[])
+    #model.save('/home/telese/TETYS/pipeline/src/python/models/fasttext/word2vec')
+
+    ## prova word2vec
+    model = Word2Vec.load("/home/telese/TETYS/pipeline/src/python/models/fasttext/word2vec")
+    print(list(w for w in model.wv.index_to_key))
+    print(model.wv.most_similar('trattato', topn=10))
 
 
