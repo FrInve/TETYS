@@ -10,7 +10,7 @@ import regex as re
 #in questo script calcoliamo l'edit distance tra topic considerando un modello trainato 
 #su un documento che conteneva la concatenazione dei titoli degli articoli
 
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/metadata_superclean_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -19,7 +19,7 @@ DATASET_TEXT_FEATURE = (
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/13_novembre_full_titles/model_0.4132', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/model_0.4781056328616278.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = model.get_document_info(documents)
 #document_topics.to_csv("model_topics.csv")
 document_topics = pd.concat([document_topics, df['l.id'].rename("law_id")], axis=1)
@@ -29,8 +29,6 @@ document_topics['Top_n_words'] = document_topics['Top_n_words'].apply(lambda x: 
 #document_topics['Name'] = document_topics['Name'].apply(lambda x: re.sub('-', ' ', x))
 document_topics.rename(columns={'law_id': 'id'}, inplace=True)
 document_topics.rename(columns={'Top_n_words': 'model_topics'}, inplace=True)
-
-
 
 
 # Andrea topics

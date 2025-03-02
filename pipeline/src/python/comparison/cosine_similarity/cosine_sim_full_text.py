@@ -1,4 +1,4 @@
-from lev_distance import min_dis
+from sentence_transformers import SentenceTransformer, util
 from bertopic import BERTopic
 import pandas as pd
 import regex as re
@@ -9,6 +9,8 @@ DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbrai
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
+
+sentence_model = SentenceTransformer('sentence-transformers/distiluse-base-multilingual-cased-v1')
 
 # Model topics
 df = pd.read_parquet(DATASET_PATH)
@@ -25,21 +27,20 @@ document_topics['Top_n_words'] = document_topics['Top_n_words'].apply(lambda x: 
 document_topics.rename(columns={'law_id': 'id'}, inplace=True)
 document_topics.rename(columns={'Top_n_words': 'model_topics'}, inplace=True)
 
-
 # Andrea topics
 df_andrea = pd.read_csv("/home/telese/TETYS/pipeline/src/python/data/export.csv")
 df_andrea['id'] = df_andrea['id'].apply(lambda x: re.sub('"', '', x))
 df_andrea['topics'] = df_andrea['topics'].apply(lambda x: re.sub('"', '', x))
 
 # Merge the dataframes
-df_lev = pd.merge(left=document_topics, right=df_andrea, on='id', how='inner', suffixes=('_model', '_andrea'))
-df_lev.rename(columns={'model_topics': 'topics_model'}, inplace=True)
-df_lev.rename(columns={'topics': 'topics_andrea'}, inplace=True)
+df_cos_sim = pd.merge(left=document_topics, right=df_andrea, on='id', how='inner', suffixes=('_model', '_andrea'))
+df_cos_sim.rename(columns={'model_topics': 'topics_model'}, inplace=True)
+df_cos_sim.rename(columns={'topics': 'topics_andrea'}, inplace=True)
 
 # now we need to split some strings
-df_lev['topics_model'] = df_lev['topics_model'].apply(lambda x: x.split('-'))
+df_cos_sim['topics_model'] = df_cos_sim['topics_model'].apply(lambda x: x.split('-'))
 #df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x: x.split(';'))
-df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x:  re.sub(';', " ", x))
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x:  re.sub(';', " ", x))
 
 # Clean stopwords from Andrea's topics
 nlp = spacy.load('it_core_news_sm') 
@@ -55,46 +56,46 @@ nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli',
                             'regolamento','termine', 'termini', 'testi', 'testo',
                             'vigore', 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre',
                             'dicembre',}
-df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
 
 # Delete digits from Andrea's topics
-df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x:  re.sub('\d+', " ", x))
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x:  re.sub('\d+', " ", x))
 
 # Split words
-df_lev['topics_andrea'] = df_lev['topics_andrea'].apply(lambda x: re.split(' ', x))
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x: re.split(' ', x))
 
-avg_edit_dist = []
-
-for row in df_lev.iterrows():
-    model_list = row[1]['topics_model']
-    andrea_list = row[1]['topics_andrea']
-    sum_distances = 0
-#l'average edit distance in questo caso viene trovata calcolando l'edit distance tra una parola del topic del mio modello 
-#e tutte le altre parole dei topic di andrea. Tra tutte queste distanze viene salvata la minore
-#infine viene calcolata la media per ogni documento
-    for i in range(1, len(model_list)):
-        min_distance = min_dis(model_list[i], andrea_list[0])
-
-        for j in andrea_list:
-            edit_distance = min_dis(model_list[i], j)
-            if edit_distance<min_distance:
-                min_distance = edit_distance
-        
-        sum_distances += min_distance
-    
-    avg_distance = sum_distances/(len(model_list))
-    avg_edit_dist.append(avg_distance)
-
-df_lev['average_edit_distance'] = avg_edit_dist
-
-df_lev.astype(
+df_cos_sim.astype(
         {
             "id": "string",
             "topics_model": "string",
             "topics_andrea": "string",
-            "average_edit_distance": "string",
         }
-).to_csv("edit_distance.csv")
+)
+
+cosine_similarities = []
+
+for row in df_cos_sim.iterrows():
+    # create a string from the list of topics
+    model_topics = ' '.join(row[1]['topics_model'])
+    andrea_topics = ' '.join(row[1]['topics_andrea'])
+
+    # remove extra spaces
+    " ".join(model_topics.split())
+    " ".join(andrea_topics.split())
+
+    # create the embeddings for each sentence
+    model_topics_embeddings = sentence_model.encode(model_topics)
+    andrea_topics_embeddings = sentence_model.encode(andrea_topics)
+
+    # compute the similarity between the embeddings
+    similarity = util.pytorch_cos_sim(model_topics_embeddings, andrea_topics_embeddings)[0][0].item()
+
+    cosine_similarities.append(similarity)
+
+
+df_cos_sim['cosine_similarity'] = cosine_similarities
+
+df_cos_sim.to_csv("cosine_sim.csv")
     
 
 

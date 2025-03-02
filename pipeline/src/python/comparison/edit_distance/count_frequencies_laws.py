@@ -7,7 +7,7 @@ from bertopic import BERTopic
 #from Data.lev_distance import min_dis
 import seaborn as sns
 
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/16_dicembre/metadata_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -27,9 +27,18 @@ df_andrea['topics'] = df_andrea['topics'].apply(lambda x: re.sub(';', ' - ', x))
 #eliminate stopwords and digits
 # Clean stopwords from Andrea's topics
 nlp = spacy.load('it_core_news_sm') 
-nlp.Defaults.stop_words |= {'regolamento', 'decreto', 'legislativo', 'decreto-legislativo', 'decreto-legge', 'decreti-legge', 'normativa', 
-                        'ministeriale', 'legislazione', 'legge', 'governo', 'articolo', 'attuazione', 'regolamento', 'direttiva', 'comma',
-                        'Regolamento', 'modifica', 'Attuazione', 'testo', 'Testo', 'direttive', }
+nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli', 'attuazione','clausola', 'clausole', 'codice', 'codici',
+                            'comma','commissione', 'commissioni', 'd',
+                            'decreti-legge','decreto', 'decreti', 'decreto-legge','decreto-legislativo','direttiva',
+                            'direttive','disciplina', 'discipline', 'disposizioni',
+                            'disposizione', 'esecuzione','governo', 'governi', 'g', 'il', 'italia','italy', 'italiano', 'l', 'legge', 'leggi', 
+                            'legislativo','legislazione', 'legislazioni', 'materia', 'materie',
+                            'ministeriale','misura','misure','modifica','modifiche',
+                            'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'n', 'parlamento', 'procedimento','procedimenti', 'procedura',
+                            'provvedimento', 'provvedimenti', 'procedure', 'ratifica', 'ratifiche', 'regolamenti', 
+                            'regolamento','termine', 'termini', 'testi', 'testo',
+                            'vigore', 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre',
+                            'dicembre', }
 df_andrea['topics'] = df_andrea['topics'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
 
 # Delete digits from Andrea's topics
@@ -55,7 +64,7 @@ word_freq_dict = dict(top_20_words)
 #plt.show()
 
 # import model
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/16_dicembre_full_titles/model_0.3441648391923259.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/model_0.4781056328616278.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = model.get_document_info(documents)
 
 # add the frequency of each topic

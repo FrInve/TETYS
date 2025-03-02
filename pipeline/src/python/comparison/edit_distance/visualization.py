@@ -3,18 +3,17 @@ import matplotlib
 from matplotlib import pyplot as plt
 from bertopic import BERTopic
 
-'''
-df_nuovo = pd.read_csv('Data/edit_distance_articoli.csv')
-df_vecchio = pd.read_csv('Data/edit_distance_articoli_vecchio.csv') 
+df_nuovo = pd.read_csv('edit_distance.csv')
+#df_vecchio = pd.read_csv('Data/edit_distance_articoli_vecchio.csv') 
 print('Edit distance mean is ', df_nuovo['average_edit_distance'].mean())
 print('Edit distance median is ', df_nuovo['average_edit_distance'].median())
-print('Previous edit distance mean was ', df_vecchio['average_edit_distance'].mean())
-print('Previous edit distance median was ', df_vecchio['average_edit_distance'].median())'''
+#print('Previous edit distance mean was ', df_vecchio['average_edit_distance'].mean())
+#print('Previous edit distance median was ', df_vecchio['average_edit_distance'].median())
 
 
-model = BERTopic.load('Modelli/13_novembre_articles/model_0.4214', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/model_0.4781056328616278.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 
-DATASET_PATH ="Data/metadata_superclean_articles.parquet"
+DATASET_PATH ="/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -29,16 +28,13 @@ unique_topics = document_topics.drop_duplicates(subset='Topic', keep='first')
 unique_topics.sort_values(by = 'topics_frequency', ascending=False, inplace = True)
 unique_topics = unique_topics.head(40)
 df_model_final = unique_topics[['Top_n_words', 'Topic', 'topics_frequency']]
-df_model_final.to_csv('Data/topics_modello_articoli.csv')
+df_model_final.to_csv('topics_modello_articoli.csv')
 
-'''
 #plot edit distance
-df_nuovo['average_edit_distance'].plot.box()
-plt.show()
-df_vecchio['average_edit_distance'].plot.box()
-plt.show()
-model.visualize_heatmap().show()
-'''
+df_nuovo.boxplot(column=['average_edit_distance'], return_type='axes')
+#df_vecchio['average_edit_distance'].plot.box()
+#plt.show()
+#model.visualize_heatmap().show()
 
 '''
 DATASET_PATH = "Data/metadata_superclean_full_titles.parquet"

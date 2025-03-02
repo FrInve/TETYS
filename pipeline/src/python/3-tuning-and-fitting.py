@@ -24,16 +24,16 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/16_dicembre/metadata_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/20_febb_full_titles/"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
 TASK_FOR_LLM = "Cluster these laws titles'"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
-NUMBER_OF_ITERATIONS = 100
-#NUMBER_OF_ITERATIONS = 300
+#NUMBER_OF_ITERATIONS = 100
+NUMBER_OF_ITERATIONS = 300
 TOKENIZER = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
@@ -70,7 +70,6 @@ def create_model(umap_model_, hdbscan_model_):
     )
 
     return topic_model
-
 
 if __name__ == "__main__":
     # Set logging
@@ -121,7 +120,7 @@ if __name__ == "__main__":
         "umap__min_dist": [0.0],
         "umap__n_components": [5, 10, 20],
         "hdbscan__min_samples": [5, 10, 20, 30, 50, 70],
-        "hdbscan__min_cluster_size": list(range(5, 20, 5)),
+        "hdbscan__min_cluster_size": list(range(10, 50, 5)),
         "hdbscan__cluster_selection_method": ["eom", "leaf"],
         "hdbscan__metric": ["euclidean"],
     }
@@ -167,11 +166,21 @@ if __name__ == "__main__":
                 topics, probs = topic_model.fit_transform(
                     documents,embeddings=embeddings
                 )
-                # Use the function reduce outliers to try to reduce the outliers' articles
+
+                #Visualize documents 
+                #topic_model.visualize_documents(documents, hide_document_hover=True, hide_annotations=True).show()
+
+                # Reduce outliers
                 logging.info("Reduce outliers ...")
-                new_topics = topic_model.reduce_outliers(documents, topics, embeddings=embeddings)
-                topic_model.update_topics(documents, topics=new_topics)
+                try:
+                    new_topics = topic_model.reduce_outliers(documents, topics, embeddings=embeddings, probabilities=probs, strategy="probabilities")
+                    topic_model.update_topics(documents, topics=new_topics)
+                except:
+                    logging.info('No outliers to reduce')
                 logging.info("BERTopic model fitted and data transformed.")
+
+                # Visualize documents again after having reduced the outliers
+                #topic_model.visualize_documents(documents, hide_document_hover=True, hide_annotations=True).show()
 
                 # Store the model
                 topic_model.save(

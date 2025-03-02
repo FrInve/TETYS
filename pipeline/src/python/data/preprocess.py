@@ -14,13 +14,16 @@ nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli',
                             'comma','commissione', 'commissioni', 'd',
                             'decreti-legge','decreto', 'decreti', 'decreto-legge','decreto-legislativo','direttiva',
                             'direttive','disciplina', 'discipline', 'disposizioni',
-                            'disposizione', 'esecuzione','governo', 'governi', 'g','il','italia','italy', 'italiano', 'l', 'legge', 'leggi', 
+                            'disposizione', 'esecuzione','governo', 'governi', 'g', 'il', 'italia','italy', 'italiano', 'l', 'legge', 'leggi', 
                             'legislativo','legislazione', 'legislazioni', 'materia', 'materie',
                             'ministeriale','misura','misure','modifica','modifiche',
-                            'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'parlamento', 'procedimento','procedimenti', 'procedura',
+                            'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'n', 'parlamento', 'procedimento','procedimenti', 'procedura',
                             'provvedimento', 'provvedimenti', 'procedure', 'ratifica', 'ratifiche', 'regolamenti', 
                             'regolamento','termine', 'termini', 'testi', 'testo',
-                            'vigore', }
+                            'vigore', 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre',
+                            'dicembre',}
+
+
 
 def concatenate_articles_ordered(group):
     # Sort articles by article number
@@ -37,14 +40,22 @@ def concatenate_only_titles(group):
     return pd.Series({'text': concatenated_text})
 
 def remove_digits_stopwords_punctuation_convert_lowercase(df):
+    # first convert df to string
+    df['text'] = df['text'].astype(str)
     # convert to lowercase
     df['text'] = df['text'].apply(lambda x: x.lower())
-    # remove digits and apostrophes
-    df['text'] = df['text'].apply(lambda x:  re.sub("\d+|'", " ", x))
-    # remove all punctuation
-    # df['text'] = df['text'].apply(lambda x:  re.sub("[^\w\s]", " ", x))
+    # remove digits 
+    df['text'] = df['text'].apply(lambda x:  re.sub("\d+", "", x))
+    # remove exactly this kind of substrings
+    df['text'] = df['text'].apply(lambda x:  re.sub(r'\(\s*\w\s*\)', '', x))
+    # remove the /n instances
+    df['text'] = df['text'].apply(lambda x:  re.sub(r'(\/n)', '', x))
+    # remove all punctuation except apostrophes
+    # df['text'] = df['text'].apply(lambda x:  re.sub("[^\p{L}\d\s']", " ", x))
     # remove stopwords
     df['text'] = df['text'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
+    # remove extra spaces
+    df['text'] = df['text'].apply(lambda text: " ".join(text.split()))
     return df
 
 @df_info
