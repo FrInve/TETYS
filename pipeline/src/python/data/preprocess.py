@@ -1,6 +1,5 @@
 import dask.dataframe as dd
 import dask.multiprocessing
-#from langdetect import DetectorFactory, detect
 import pandas as pd
 from pandas import merge, to_datetime
 from utils import df_info
@@ -9,17 +8,17 @@ import regex as re
 import time
 
 #DetectorFactory.seed = 0s
-nlp = spacy.load('it_core_news_sm') 
-nlp.Defaults.stop_words |= {'abrogazione','applicazione','articolo', 'articoli', 'attuazione','clausola', 'clausole', 'codice', 'codici',
+nlp = spacy.load('it_core_news_lg') 
+nlp.Defaults.stop_words |= {'abrogazione', 'allegato', 'applicazione', 'articolo', 'articoli', 'attuazione','clausola', 'clausole', 'codice', 'codici',
                             'comma','commissione', 'commissioni', 'd',
                             'decreti-legge','decreto', 'decreti', 'decreto-legge','decreto-legislativo','direttiva',
                             'direttive','disciplina', 'discipline', 'disposizioni',
-                            'disposizione', 'esecuzione','governo', 'governi', 'g', 'il', 'italia','italy', 'italiano', 'l', 'legge', 'leggi', 
+                            'disposizione', 'esecuzione','governo', 'governi', 'g', 'il', 'italia', 'italy', 'italiano', 'l', 'legge', 'leggi', 
                             'legislativo','legislazione', 'legislazioni', 'materia', 'materie',
                             'ministeriale','misura','misure','modifica','modifiche',
-                            'norma', 'norme', 'normativa', 'normative', 'numero','numeri', 'n', 'parlamento', 'procedimento','procedimenti', 'procedura',
+                            'norma', 'norme', 'normativa', 'normative', 'numero', 'numeri', 'n', 'parlamento', 'procedimento','procedimenti', 'procedura',
                             'provvedimento', 'provvedimenti', 'procedure', 'ratifica', 'ratifiche', 'regolamenti', 
-                            'regolamento','termine', 'termini', 'testi', 'testo',
+                            'regolamento', 'repubblica', 'termine', 'termini', 'testi', 'testo',
                             'vigore', 'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre',
                             'dicembre',}
 
@@ -43,17 +42,26 @@ def remove_digits_stopwords_punctuation_convert_lowercase(df):
     # first convert df to string
     df['text'] = df['text'].astype(str)
     # convert to lowercase
-    df['text'] = df['text'].apply(lambda x: x.lower())
+    # df['text'] = df['text'].apply(lambda x: x.lower())
     # remove digits 
-    df['text'] = df['text'].apply(lambda x:  re.sub("\d+", "", x))
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"\d+", " ", x))
     # remove exactly this kind of substrings
-    df['text'] = df['text'].apply(lambda x:  re.sub(r'\(\s*\w\s*\)', '', x))
+    df['text'] = df['text'].apply(lambda x:  re.sub(r'\(\s*\w\s*\)', ' ', x))
     # remove the /n instances
-    df['text'] = df['text'].apply(lambda x:  re.sub(r'(\/n)', '', x))
-    # remove all punctuation except apostrophes
-    # df['text'] = df['text'].apply(lambda x:  re.sub("[^\p{L}\d\s']", " ", x))
+    df['text'] = df['text'].apply(lambda x:  re.sub(r'(\/n)', ' ', x))
+    # remove extra spaces
+    df['text'] = df['text'].apply(lambda text: " ".join(text.split()))
     # remove stopwords
     df['text'] = df['text'].apply(lambda text: " ".join(token.lemma_ for token in nlp(text) if not token.is_stop))
+    # remove all punctuation except apostrophes
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"[^\p{L}\d\s']", " ", x))
+
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"\/\/", " ", x))
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"\sil\s", " ", x))
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"\snumero\s", " ", x))
+
+    # remove single letters
+    df['text'] = df['text'].apply(lambda x:  re.sub(r"\s[a-zA-Z]\s", " ", x))
     # remove extra spaces
     df['text'] = df['text'].apply(lambda text: " ".join(text.split()))
     return df

@@ -26,14 +26,13 @@ from spacy.lang.it.stop_words import STOP_WORDS
 ### CONFIGURATION ###
 DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
 DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/"
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_marzo_rimozione_punteggiatura/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
 TASK_FOR_LLM = "Cluster these laws titles'"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
-#NUMBER_OF_ITERATIONS = 100
-NUMBER_OF_ITERATIONS = 300
+NUMBER_OF_ITERATIONS = 100
 TOKENIZER = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
@@ -115,13 +114,25 @@ if __name__ == "__main__":
     )
 
     # specify parameters and distributions to sample from
+    '''
     param_grid = {
-        "umap__n_neighbors": [2, 10, 20, 40],
+        "umap__n_neighbors": [2, 5, 10, 15, 20, 25],
         "umap__min_dist": [0.0],
-        "umap__n_components": [5, 10, 20],
+        "umap__n_components": [5, 10, 15, 20, 25],
         "hdbscan__min_samples": [5, 10, 20, 30, 50, 70],
-        "hdbscan__min_cluster_size": list(range(10, 50, 5)),
+        "hdbscan__min_cluster_size": list(range(5, 50, 5)),
         "hdbscan__cluster_selection_method": ["eom", "leaf"],
+        "hdbscan__metric": ["euclidean"],
+    }'
+    '''
+
+    param_grid = {
+        "umap__n_neighbors": [2],
+        "umap__min_dist": [0.0],
+        "umap__n_components": [5],
+        "hdbscan__min_samples": [5],
+        "hdbscan__min_cluster_size": [5],
+        "hdbscan__cluster_selection_method": ["eom"],
         "hdbscan__metric": ["euclidean"],
     }
 
@@ -183,10 +194,10 @@ if __name__ == "__main__":
                 #topic_model.visualize_documents(documents, hide_document_hover=True, hide_annotations=True).show()
 
                 # Store the model
-                topic_model.save(
-                    BEST_MODELS_PATH + f"model_{best_score}.pickle",
-                    save_embedding_model=False,
-                )
+                # topic_model.save(
+                #    BEST_MODELS_PATH + f"model_{best_score}.pickle",
+                #    save_embedding_model=False,
+                #)
 
                 topic_model.save(
                     BEST_MODELS_PATH + f"model_{best_score}.safetensors",

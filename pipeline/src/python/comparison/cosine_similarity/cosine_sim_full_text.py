@@ -16,7 +16,7 @@ sentence_model = SentenceTransformer('sentence-transformers/distiluse-base-multi
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/2_mar_full_titles/model_0.4781056328616278.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/6_marzo/model_0.4650868719159047.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = model.get_document_info(documents)
 #document_topics.to_csv("model_topics.csv")
 document_topics = pd.concat([document_topics, df['l.id'].rename("law_id")], axis=1)
@@ -61,8 +61,14 @@ df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda text: " "
 # Delete digits from Andrea's topics
 df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x:  re.sub('\d+', " ", x))
 
+# Delete special character
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x:  re.sub('\-', " ", x))
+
 # Split words
 df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x: re.split(' ', x))
+
+# Drop duplicated words
+df_cos_sim['topics_andrea'] = df_cos_sim['topics_andrea'].apply(lambda x: list( dict.fromkeys(x) ))
 
 df_cos_sim.astype(
         {
@@ -96,6 +102,9 @@ for row in df_cos_sim.iterrows():
 df_cos_sim['cosine_similarity'] = cosine_similarities
 
 df_cos_sim.to_csv("cosine_sim.csv")
+
+print('Mean is: ', df_cos_sim['cosine_similarity'].mean())
+print('Median is: ', df_cos_sim['cosine_similarity'].median())
     
 
 

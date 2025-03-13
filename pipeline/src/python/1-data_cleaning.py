@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import pandas as pd
 from data import preprocess as prep
 from neo4j_extraction.df_extraction import giveMeDataLawsTitles as getDataFrameTitles
 from neo4j_extraction.df_extraction import giveMeDataLawsFull as getDataFrameFull
 from collections import Counter
-import regex as re
-import spacy
 import dask
 import dask.multiprocessing
 
 if __name__ == "__main__":
 
     df = getDataFrameFull()
+
+    #df.to_csv('raw csv.csv')
 
     with dask.config.set(scheduler="processes", num_workers=8):
         df_clean = (
