@@ -101,6 +101,20 @@ We are still working on testing and validating the application. More to come on 
 
 Please, consider citing this work in your research as:
 
+Invernici, F., Bernasconi, A., Curati, F., Jakimov, J., & Samavi, A. (2025). TETYS: Configurable Topic Modeling Exploration for Big Corpora of Text Documents. In Proceedings of the 28th International Conference on Extending Database Technology (EDBT) (Vol. 28, No. 3, pp. 1114-1117). [https://openproceedings.org/2025/conf/edbt/paper-323.pdf](https://openproceedings.org/2025/conf/edbt/paper-323.pdf)
+
+```bibtex
+@inproceedings{invernici2025tetys,
+  title={TETYS: Configurable Topic Modeling Exploration for Big Corpora of Text Documents},
+  author={Invernici, Francesco and Bernasconi, Anna and Curati, Francesca and Jakimov, Jelena and Samavi, Amirhossein and others},
+  booktitle={Proceedings of the 28th International Conference on Extending Database Technology (EDBT)},
+  volume={28},
+  number={3},
+  pages={1114--1117},
+  year={2025}
+}
+```
+
 Invernici, F., Curati, F., Jakomov, J., Samavi, A., & Bernasconi, A. (2024). Capturing research literature attitude towards Sustainable Development Goals: an LLM-based topic modeling approach. 
 arXiv preprint arXiv:2411.02943. [https://arxiv.org/abs/2411.02943](https://arxiv.org/abs/2411.02943)
 
