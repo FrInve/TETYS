@@ -93,13 +93,16 @@ Our Master Students Francesca and Amir have joined the team to help us improve t
 
 **November 4th, 2024**: We presented TETYS at the Open Web Search standup meeting
 
-We are still working on testing and validating the application. More to come on applying TETYS to other domains ( ...like legislative text :) 
+**March 26th, 2025**: Francesco and Anna presented the TETYS tool in the Demo Track of the EDBT Conference (Barcelona, Spain)
+(see Poster [here](https://annabernasconi.faculty.polimi.it/wp-content/uploads/poster_demo_tetys.pdf)
+
+We are still working on testing and validating the application. More to come on applying TETYS to other domains (...like legislative text and the Open Web Search Index :) 
 
 ---
 
 ## Citation
 
-Please, consider citing this work in your research as:
+Please consider citing this work in your research as:
 
 Invernici, F., Bernasconi, A., Curati, F., Jakimov, J., & Samavi, A. (2025). TETYS: Configurable Topic Modeling Exploration for Big Corpora of Text Documents. In Proceedings of the 28th International Conference on Extending Database Technology (EDBT) (Vol. 28, No. 3, pp. 1114-1117). [https://openproceedings.org/2025/conf/edbt/paper-323.pdf](https://openproceedings.org/2025/conf/edbt/paper-323.pdf)
 
