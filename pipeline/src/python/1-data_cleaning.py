@@ -10,14 +10,14 @@ import dask.multiprocessing
 
 if __name__ == "__main__":
 
-    df = getDataFrameFull()
+    df =getDataFrameTitles()
 
     #df.to_csv('raw csv.csv')
 
     with dask.config.set(scheduler="processes", num_workers=8):
         df_clean = (
             df.pipe(prep.start_pipeline)
-            .pipe(prep.get_grouped_df_ordered_only_titles)
+            .pipe(prep.get_grouped_df_ordered_only_law_titles)
             .pipe(prep.clean_text_dask)
         )
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             "text": "string",
             "l.id": "string",
         }
-    ).to_parquet("./data/processed/25_febbraio/metadata_full_titles.parquet")
+    ).to_parquet("/home/telese/TETYS/pipeline/src/python/data/processed/maggio/metadata_titles_1948.parquet")
 
     print(df_clean.head())
 
@@ -80,6 +80,6 @@ if __name__ == "__main__":
             "text": "string",
             "l.id": "string",
         }
-    ).to_csv("./data/processed/25_febbraio/metadata_full_titles.csv")
+    ).to_csv("/home/telese/TETYS/pipeline/src/python/data/processed/maggio/metadata_titles_1948.csv")
 
 

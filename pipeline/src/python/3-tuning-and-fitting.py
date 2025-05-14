@@ -24,17 +24,20 @@ from sklearn.model_selection import ParameterSampler
 from spacy.lang.it.stop_words import STOP_WORDS
 
 ### CONFIGURATION ###
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
-DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings.npy"
-BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/12_marzo_rimozione_punteggiatura/"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/maggio/metadata_titles_1948.parquet"
+DATASET_AS_EMBEDDINGS_PATH = "./data/interim/embeddings_titles_1948_bis.npy"
+#DATASET_AS_EMBEDDINGS_PATH = '/home/telese/embeddings.pickle'
+BEST_MODELS_PATH = "/home/telese/TETYS/pipeline/src/python/models/tuning/26_aprile_1948/"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
-TASK_FOR_LLM = "Cluster these laws titles'"
+TASK_FOR_LLM = "Cluster these laws"
 VALIDATION_SPLIT_PERCENTAGE = 0.25
-NUMBER_OF_ITERATIONS = 100
-TOKENIZER = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
-EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
+NUMBER_OF_ITERATIONS = 300
+TOKENIZER = 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2'
+EMBEDDING_MODEL = 'sentence-transformers/paraphrase-multilingual-mpnet-base-v2'
+#TOKENIZER = 'Alibaba-NLP/gte-Qwen2-1.5B-instruct'
+#EMBEDDING_MODEL = 'Alibaba-NLP/gte-Qwen2-1.5B-instruct'
 
 ### END OF CONFIGURATION ###
 
@@ -56,6 +59,7 @@ def create_model(umap_model_, hdbscan_model_):
         model=EMBEDDING_MODEL,
         tokenizer=tokenizer,
         device="cpu",
+        trust_remote_code=True
     )
 
     topic_model = BERTopic(
@@ -88,7 +92,8 @@ if __name__ == "__main__":
     logging.info(f"Data loaded - {len(documents)} documents available")
 
     with open(DATASET_AS_EMBEDDINGS_PATH, "rb") as f:
-        embeddings = np.load(f)
+        embeddings = np.load(f, allow_pickle=True)
+        #embeddings = np.asarray(embs[1], dtype=np.float32)
     logging.info("Data loaded")
 
     # generate random boolean mask the length of data
@@ -114,27 +119,29 @@ if __name__ == "__main__":
     )
 
     # specify parameters and distributions to sample from
-    '''
+    
+    
     param_grid = {
-        "umap__n_neighbors": [2, 5, 10, 15, 20, 25],
+        "umap__n_neighbors": [10, 20, 30, 40, 50, 55],
         "umap__min_dist": [0.0],
-        "umap__n_components": [5, 10, 15, 20, 25],
-        "hdbscan__min_samples": [5, 10, 20, 30, 50, 70],
+        "umap__n_components": [10, 20, 30, 50, 75, 100],
+        "hdbscan__min_samples": [10, 20, 50, 70, 100, 120],
         "hdbscan__min_cluster_size": list(range(5, 50, 5)),
         "hdbscan__cluster_selection_method": ["eom", "leaf"],
         "hdbscan__metric": ["euclidean"],
-    }'
+    }
     '''
-
+    
     param_grid = {
-        "umap__n_neighbors": [2],
+        "umap__n_neighbors": [2, 5, 10, 15],
         "umap__min_dist": [0.0],
-        "umap__n_components": [5],
-        "hdbscan__min_samples": [5],
-        "hdbscan__min_cluster_size": [5],
-        "hdbscan__cluster_selection_method": ["eom"],
+        "umap__n_components": [5, 10, 15, 20],
+        "hdbscan__min_samples": [5, 10, 15, 20],
+        "hdbscan__min_cluster_size": [5, 10, 15, 20],
+        "hdbscan__cluster_selection_method": ["eom", "leaf"],
         "hdbscan__metric": ["euclidean"],
     }
+    '''
 
     # Initialize the optimization variables
     best_score = -1
@@ -163,7 +170,7 @@ if __name__ == "__main__":
             best_score = current_score
             best_params = params
             logging.info(f"Found params achieving DBCV score {best_score:.3f}")
-            if best_score >= 0.4:
+            if best_score >= 0.34:
                 ### Fit a model with the best parameters - only if the score is good enough
                 logging.info("Creating a BERTopic model with the best parameters...")
                 # Init a BERTopic model

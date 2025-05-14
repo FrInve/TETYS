@@ -9,7 +9,7 @@ import spacy
 import pickle
 
 
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_text_2016.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
@@ -20,7 +20,7 @@ sentence_model = SentenceTransformer('embaas/sentence-transformers-multilingual-
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-topic_model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/12_marzo_rimozione_punteggiatura/model_0.41913836673087335.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+topic_model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/30_marzo_fulltext/model_0.403241194641185.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = topic_model.get_document_info(documents)
 document_topics.to_csv("model_topics.csv")
 document_topics = pd.concat([document_topics, df['l.id'].rename("law_id")], axis=1)
@@ -32,13 +32,21 @@ document_topics.rename(columns={'law_id': 'id'}, inplace=True)
 document_topics.rename(columns={'Top_n_words': 'model_topics'}, inplace=True)
 document_topics.rename(columns={'Topic': 'topic_id'}, inplace=True)
 
+## This part is done to extract the documents belonging to a certain cluster
+# Comment if not needed
+target_topic_id = document_topics.loc[document_topics['id'] == '2016|191', 'topic_id'].iloc[0]
+print(target_topic_id)
+document_topics_filtered = document_topics[document_topics['topic_id'] == target_topic_id]
+print(document_topics_filtered.head())
+print(document_topics_filtered.shape)
+
 # Andrea topics
 df_andrea = pd.read_csv("/home/telese/TETYS/pipeline/src/python/data/export.csv")
 df_andrea['id'] = df_andrea['id'].apply(lambda x: re.sub('"', '', x))
 df_andrea['topics'] = df_andrea['topics'].apply(lambda x: re.sub('"', '', x))
 
 # Merge the dataframes
-df_topics_joined = pd.merge(left=document_topics, right=df_andrea, on='id', how='inner', suffixes=('_model', '_andrea'))
+df_topics_joined = pd.merge(left=document_topics_filtered, right=df_andrea, on='id', how='inner', suffixes=('_model', '_andrea'))
 df_topics_joined.rename(columns={'model_topics': 'topics_model'}, inplace=True)
 df_topics_joined.rename(columns={'topics': 'topics_andrea'}, inplace=True)
 
@@ -78,7 +86,8 @@ df_topics_joined['topics_andrea'] = df_topics_joined['topics_andrea'].apply(lamb
 # Start buildin the ranking matrix
 list_of_matrices =[]
 list_of_ranking = []
-for row in tqdm(df_topics_joined.iloc[1501:].iterrows(), total=len(df_topics_joined.iloc[1501:])):
+#for row in tqdm(df_topics_joined.iloc[1501:].iterrows(), total=len(df_topics_joined.iloc[1501:])):
+for row in tqdm(df_topics_joined.iterrows(), total=len(df_topics_joined)):
     tuple_list = []
     ranking_matrix = []
     subtopics = row[1]['topics_model']
@@ -104,7 +113,9 @@ for row in tqdm(df_topics_joined.iloc[1501:].iterrows(), total=len(df_topics_joi
             # compute the label embedding
             label_embedding = sentence_model.encode(str(label))
             # compute the score (right now  is cosine_similarity*c-tf-idf of the current subtopic)
-            score = float(util.pytorch_cos_sim(subtopic_embedding, label_embedding)[0][0].item()) * float(subtopic_relevance)
+            #score = float(util.pytorch_cos_sim(subtopic_embedding, label_embedding)[0][0].item()) * float(subtopic_relevance)
+            # uncomment this if you want the score to be only the cosine similarity
+            score = float(util.pytorch_cos_sim(subtopic_embedding, label_embedding)[0][0].item()) 
             tuple = (label, subtopic, score)
             tuple_list.append(tuple)
             matrix_row.append(score)
@@ -133,12 +144,12 @@ for row in tqdm(df_topics_joined.iloc[1501:].iterrows(), total=len(df_topics_joi
 
 # concatenate all the dfs
 df_ranking = pd.DataFrame(list_of_ranking)
-df_ranking.to_csv('rankings_1500.csv')
+df_ranking.to_csv('rankings_full_text_topic17.csv')
 # save the matrices
 list_of_matrices = np.array(list_of_matrices, dtype=object)
-np.savez_compressed('matrices_compressed_1500', list_of_matrices)
+np.savez_compressed('matrices_compressed_full_text_topic17', list_of_matrices)
 # save with pickle
-with open("all_matrices_1500.pkl", "wb") as f:
+with open("all_matrices_full_text_topic17.pkl", "wb") as f:
     pickle.dump(list_of_matrices, f)
 # df_final = pd.DataFrame.from_dict(map(dict,list_of_df))
 # df_final.to_csv('all_matrices_prova.csv')

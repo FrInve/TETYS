@@ -16,7 +16,7 @@ sentence_model = SentenceTransformer('sentence-transformers/distiluse-base-multi
 df = pd.read_parquet(DATASET_PATH)
 documents = df[DATASET_TEXT_FEATURE].apply(str).to_list()
 
-model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/6_marzo/model_0.4650868719159047.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
+model = BERTopic.load('/home/telese/TETYS/pipeline/src/python/models/tuning/12_marzo_rimozione_punteggiatura/model_0.41913836673087335.safetensors', embedding_model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 document_topics = model.get_document_info(documents)
 #document_topics.to_csv("model_topics.csv")
 document_topics = pd.concat([document_topics, df['l.id'].rename("law_id")], axis=1)

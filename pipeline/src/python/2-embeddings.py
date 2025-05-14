@@ -13,12 +13,12 @@ from bertopic.backend import BaseEmbedder
 from transformers.pipelines import pipeline
 
 ### CONFIGURATION ###
-DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/25_febbraio/metadata_full_titles.parquet"
+DATASET_PATH = "/home/telese/TETYS/pipeline/src/python/data/processed/maggio/metadata_titles_1948.parquet"
 DATASET_TEXT_FEATURE = (
     "text"  # In the dataset file, the column name that contains the text data
 )
 TASK_FOR_LLM = "Cluster these laws titles:"
-OUTPUT_PATH = "./data/interim/embeddings.npy"
+OUTPUT_PATH = "./data/interim/embeddings_titles_1948_bis.npy"
 
 ### END OF CONFIGURATION ###
 
