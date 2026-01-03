@@ -1,4 +1,4 @@
-bertopic==0.16.3
+bertopic==0.17.3
 dask
 huggingface-hub
 matplotlib 
@@ -22,7 +22,7 @@ six
 sniffio 
 soupsieve 
 spacy
-statsmodels==0.14.0
+statsmodels
 tokenizers
 torch
 tqdm 

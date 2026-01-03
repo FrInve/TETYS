@@ -1,0 +1,1 @@
+[[{"umap__n_neighbors": 10, "umap__n_components": 15, "umap__min_dist": 0.0, "umap__metric": "cosine", "hdbscan__min_samples": 10, "hdbscan__min_cluster_size": 70, "hdbscan__metric": "euclidean", "hdbscan__cluster_selection_method": "eom"}, 0.7572330004394461]]
