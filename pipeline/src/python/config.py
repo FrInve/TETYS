@@ -13,9 +13,15 @@ RANK_DATA_FOLDER = INTERIM_DATA_FOLDER / "rank"
 PROCESSED_DATA_FOLDER = DATA_FOLDER / "processed"
 RAW_DATA_FOLDER = DATA_FOLDER / "raw"
 EMBEDDING_FOLDER = INTERIM_DATA_FOLDER / "embeddings"
+SUMMARIES_FOLDER = INTERIM_DATA_FOLDER / "summaries"
+SUMMARIES_THE_GUARDIAN_FOLDER = SUMMARIES_FOLDER / "the_guardian"
+SUMMARIES_SCIENCE_NEWS_FOLDER = SUMMARIES_FOLDER / "science_news"
+EMBEDDING_SCIENCE_NEWS_FOLDER = EMBEDDING_FOLDER / "science_news"
+EMBEDDING_SCOPUS_FOLDER = EMBEDDING_FOLDER / "scopus"
+EMBEDDING_THE_GUARDIAN_FOLDER = EMBEDDING_FOLDER / "the_guardian"
 
-
-EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
+#EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
+EMBEDDING_MODEL = 'codefuse-ai/F2LLM-0.6B'
 
 # Science news parameters
 
@@ -88,7 +94,9 @@ MAGAZINE_CONFIG = {
         "MODEL_PATH": MODELS_FOLDER / 'the_guardian/',
         "LOG_PATH": LOGS_FOLDER / 'the_guardian/the_guardian.log',
         "HYPERPARAMETER_GRID" : THE_GUARDIAN_HYPERPARAMETERS,
-        "DOMAIN_SPECIFIC_STOP_WORDS" : THE_GUARDIAN_STOP_WORDS       
+        "DOMAIN_SPECIFIC_STOP_WORDS" : THE_GUARDIAN_STOP_WORDS,
+        "SUMMARIES_PATH" : SUMMARIES_THE_GUARDIAN_FOLDER,
+        "EMBEDDINGS_PATH": EMBEDDING_THE_GUARDIAN_FOLDER   
     },
     "mit": {
         "OUTPUT_PATH": EMBEDDING_FOLDER / 'mit_embeddings.npy',
@@ -101,13 +109,14 @@ MAGAZINE_CONFIG = {
     },
     "science_news": {
         "OUTPUT_PATH": EMBEDDING_FOLDER / 'science_news_embeddings.npy',
-        "DATASET_PATH" : RAW_DATA_FOLDER / 'science_news_pipeline_data_correct.parquet',
-        #"DATASET_PATH" : '/home/banfi/Tesi/data/processed/science_news/pipeline_data/science_news_pipeline_data.parquet',
+        "DATASET_PATH" : RAW_DATA_FOLDER / 'science_news_pipeline_data.parquet',
         "PROCESSED_PATH": PROCESSED_DATA_FOLDER / 'science_news.parquet',
         "MODEL_PATH": MODELS_FOLDER / 'science_news/',
         "LOG_PATH": LOGS_FOLDER / 'science_news/science_news.log',
         "HYPERPARAMETER_GRID" : SCIENCE_NEWS_HYPERPARAMETERS,
-        "DOMAIN_SPECIFIC_STOP_WORDS" : SCIENCE_NEWS_STOP_WORDS
+        "DOMAIN_SPECIFIC_STOP_WORDS" : SCIENCE_NEWS_STOP_WORDS,
+        "SUMMARIES_PATH" : SUMMARIES_SCIENCE_NEWS_FOLDER,
+        "EMBEDDINGS_PATH" : EMBEDDING_SCIENCE_NEWS_FOLDER
     },
     "scopus": {
         "OUTPUT_PATH": EMBEDDING_FOLDER / 'scopus_embeddings.npy',
@@ -116,6 +125,7 @@ MAGAZINE_CONFIG = {
         "MODEL_PATH": MODELS_FOLDER / 'scopus/',
         "LOG_PATH": LOGS_FOLDER / 'scopus/scopus.log',
         "HYPERPARAMETER_GRID" : SCOPUS_HYPERPARAMETERS,
-        "DOMAIN_SPECIFIC_STOP_WORDS" : SCOPUS_STOP_WORDS
+        "DOMAIN_SPECIFIC_STOP_WORDS" : SCOPUS_STOP_WORDS,
+        "EMBEDDINGS_PATH" : EMBEDDING_SCOPUS_FOLDER
     },
 }
