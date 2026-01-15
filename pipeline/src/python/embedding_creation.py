@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from datetime import datetime
 
-MAGAZINE = 'the_guardian'
+MAGAZINE = 'scopus'
 cfg_dict = cfg.MAGAZINE_CONFIG[MAGAZINE]
 
 log_file = Path(cfg.LOGS_FOLDER) / "embedding_creation.log"
@@ -26,18 +26,32 @@ logger.add(
 
 # Load summaries to embed
 
-path_summaries = f'{cfg_dict['SUMMARIES_PATH']}/{MAGAZINE}_summaries_*.parquet'
-summaries_filenames = glob(path_summaries)
+if MAGAZINE == 'scopus':
+    path_records = f'{cfg_dict['DATASET_PATH']}'
+    records_filenames = glob(path_records)
 
-if not summaries_filenames:
-    logger.error(f'No summary files found, compute the summaries before compute embeddings')
-    raise SystemExit(1)
+    if not records_filenames:
+        logger.error(f'No records files found, check records path before compute embeddings')
+        raise SystemExit(1)
 
-logger.info(f'There are {len(summaries_filenames)} files that contain summaries')
-logger.info(f'Loading files...')
-dataset_list = [ pd.read_parquet(file) for file in summaries_filenames]
-df = pd.concat(dataset_list)
-logger.info(f'The {MAGAZINE} dataframe contains {len(df)} records')
+    logger.info(f'There are {len(records_filenames)} files that contain records')
+    logger.info(f'Loading files...')
+    dataset_list = [ pd.read_parquet(file) for file in records_filenames]
+    df = pd.concat(dataset_list)
+    logger.info(f'The {MAGAZINE} dataframe contains {len(df)} records')
+else:
+    path_summaries = f'{cfg_dict['SUMMARIES_PATH']}/{MAGAZINE}_summaries_*.parquet'
+    summaries_filenames = glob(path_summaries)
+
+    if not summaries_filenames:
+        logger.error(f'No summary files found, compute the summaries before compute embeddings')
+        raise SystemExit(1)
+
+    logger.info(f'There are {len(summaries_filenames)} files that contain summaries')
+    logger.info(f'Loading files...')
+    dataset_list = [ pd.read_parquet(file) for file in summaries_filenames]
+    df = pd.concat(dataset_list)
+    logger.info(f'The {MAGAZINE} dataframe contains {len(df)} records')
 
 
 # Load summaries already embedded
@@ -133,7 +147,11 @@ def save_to_npz():
 
 for row in df_to_be_embedded.itertuples(index=False):
 
-    batch_texts.append(row.summary)
+    if MAGAZINE == 'scopus':
+        batch_texts.append(row.text)
+    else:
+        batch_texts.append(row.summary)
+
     batch_ids.append(row.id)
 
     if len(batch_texts) == BATCH_SIZE:
