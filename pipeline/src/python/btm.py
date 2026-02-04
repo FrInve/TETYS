@@ -1,15 +1,20 @@
 from bertopic import BERTopic
 import pandas as pd
+import numpy as np
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 class BTM():
 
-    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1):
+    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1,texts_2,embeddings_2):
 
         self.model_1 = model_1
         self.model_2 = model_2
         self.ids_1 = ids_1
         self.texts_1 = texts_1
         self.embeddings_1 = embeddings_1
+        self.embeddings_2 = embeddings_2
+        self.texts_2 = texts_2
 
         self.n_topics_model_1 = None
         self.topics_matrix = None
@@ -42,23 +47,55 @@ class BTM():
 
     def init(self):
 
+        # Select the threshold to decide when consider documnets as outlier (5% confidence)
+        topics_2 = np.array(self.model_2.topics_)
+        
+        _, sims_in = self.model_2.transform(self.texts_2, embeddings=self.embeddings_2)
+        mask_incluster = (topics_2 != -1)
+        sims_in_clean = sims_in[mask_incluster]
+        TH = np.quantile(sims_in_clean, 0.05) 
+
+        print(f"Threshold:{TH}")
         # Cross topic
-        topics, _ = self.model_2.transform(self.texts_1, embeddings=self.embeddings_1)
+        topics, probabilty = self.model_2.transform(self.texts_1, embeddings=self.embeddings_1)
+
+        topics_accepted = np.where(probabilty >= TH, topics, -1)
+
+        if self.model_2.custom_labels_ == None:
+            model_2_topic_dict = self.model_2.topic_labels_
+        else:
+            model_2_topic_dict = { idx:topic for idx, topic in enumerate(self.model_2.custom_labels_,start=-1) }
+
+        model_2_topic_labels = [ model_2_topic_dict[topic] for topic in topics_accepted ]
+
         model_2_topics = pd.DataFrame({'id': self.ids_1,
-                                       'Topic': topics} )
+                                       'Topic': topics_accepted,
+                                       'Topic_label': model_2_topic_labels} )
 
         #model_2_topics = self.model_2.get_document_info(self.texts_2)[['Topic']]
         #model_2_topics['id'] = self.ids_2
 
         # Native Topic
-        model_1_topics =  self.model_1.get_document_info(self.texts_1)[['Topic']]
+
+        if self.model_1.custom_labels_ is None:
+            columns_to_extract = ['Topic','Name']
+        else:
+            columns_to_extract = ['Topic','CustomName']
+
+
+        model_1_topics =  self.model_1.get_document_info(self.texts_1)[columns_to_extract]
         model_1_topics['id'] = self.ids_1
+
+        if self.model_1.custom_labels_ is None:
+            model_1_topics = model_1_topics.rename(columns={'Name':'Topic_label'})
+        else:
+           model_1_topics = model_1_topics.rename(columns={'CustomName':'Topic_label'})
 
         model_1_topics = model_1_topics[ model_1_topics.Topic != -1 ].copy()
         
         self.cooccurence_matrix = model_1_topics.merge(model_2_topics,on='id',suffixes=('_model_1','_model_2'))
 
-        topics_couple = self.cooccurence_matrix[['Topic_model_1','Topic_model_2']].value_counts().rename('Couple_counts').reset_index()
+        topics_couple = self.cooccurence_matrix[['Topic_model_1','Topic_model_2','Topic_label_model_1','Topic_label_model_2']].value_counts().rename('Couple_counts').reset_index()
 
         self.topics_matrix = topics_couple.merge(self.model_1.get_topic_info()[['Count','Topic']].rename(columns={'Topic':'Topic_model_1'}),on='Topic_model_1')
 
@@ -85,7 +122,7 @@ class BTM():
             self.compute_topic_closeness_and_uniqueness()
 
         topic_closeness_without_outlier = self.topic_closeness[ self.topic_closeness.Topic_model_2 != -1 ].reset_index()
-        self.topic_alignment = topic_closeness_without_outlier.groupby(['Topic_model_1','Count']).agg(Alignment=('Closeness','max')).reset_index()
+        self.topic_alignment = topic_closeness_without_outlier.groupby(['Topic_model_1','Topic_label_model_1','Count']).agg(Alignment=('Closeness','max')).reset_index()
         
     def compute_corpus_closeness(self):
         if self.topic_closeness is None:
@@ -95,7 +132,7 @@ class BTM():
 
         self.corpus_closeness = topic_closeness_without_outlier.Closeness.sum() / (self.n_topics_model_1)
 
-        x = topic_closeness_without_outlier.groupby(by=['Topic_model_1','Count']).agg({'Closeness':'sum'}).reset_index()
+        x = topic_closeness_without_outlier.groupby(by=['Topic_model_1','Topic_label_model_1','Count']).agg({'Closeness':'sum'}).reset_index()
         x['Weigted'] = x['Count'] * x['Closeness']
 
         den = self.model_1.get_topic_info().query("Topic != -1")["Count"].sum()
@@ -188,6 +225,65 @@ class BTM():
             self.compute_corpus_alignment()
         print(f'Corpus Alignment: {self.corpus_weighted_alignment}')
 
+
+    def create_wordcloud(self, model, topic, ax, title=None):
+        text = {word: value for word, value in model.get_topic(topic)}
+
+        wc = WordCloud(
+            background_color="white",
+            max_words=1000,
+            colormap='viridis', 
+            relative_scaling=0.5,
+            min_font_size=10
+        ).generate_from_frequencies(text)
+
+        ax.imshow(wc, interpolation="bilinear")
+        ax.axis("off")
+
+        if title:
+            ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
+
+    def compare_wordcloud_topics(self, topic_1, topic_2):
+
+        if self.model_1.custom_labels_ == None:
+            model_1_topic_dict = self.model_1.topic_labels_
+        else:
+            model_1_topic_dict = {idx: topic for idx, topic in enumerate(self.model_1.custom_labels_, start=-1)}
+
+        if self.model_2.custom_labels_ == None:
+            model_2_topic_dict = self.model_2.topic_labels_
+        else:
+            model_2_topic_dict = {idx: topic for idx, topic in enumerate(self.model_2.custom_labels_, start=-1)}
+
+        assert (topic_2 in model_2_topic_dict.keys()), f"{topic_2} doesn't exist in model 2"
+        assert (topic_1 in model_1_topic_dict.keys()), f"{topic_1} doesn't exist in model 1"
+
+        
+        fig = plt.figure(figsize=(16, 7))
+        fig.patch.set_facecolor('#f8f9fa')  
         
         
+        gs = fig.add_gridspec(1, 3, width_ratios=[1, 0.05, 1], wspace=0.05)
         
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax2 = fig.add_subplot(gs[0, 2])
+
+        
+        self.create_wordcloud(self.model_1, topic_1, ax1, title=model_1_topic_dict[topic_1])
+        self.create_wordcloud(self.model_2, topic_2, ax2, title=model_2_topic_dict[topic_2])
+
+        
+        line_ax = fig.add_subplot(gs[0, 1])
+        line_ax.axvline(x=0.5, color='#dee2e6', linewidth=3, linestyle='-')
+        line_ax.set_xlim(0, 1)
+        line_ax.set_ylim(0, 1)
+        line_ax.axis('off')
+
+        
+        fig.suptitle(f'Model 1 ({topic_1}) vs Model 2 ({topic_2})', fontsize=20, fontweight='bold', y=0.98)
+
+        plt.tight_layout()
+        plt.show()
+
+
+            
