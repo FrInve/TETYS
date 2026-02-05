@@ -6,8 +6,10 @@ import matplotlib.pyplot as plt
 
 class BTM():
 
-    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1,texts_2,embeddings_2):
+    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1,texts_2,embeddings_2,model_1_name="Model_1",model_2_name="Model_2"):
 
+        self.model_1_name = model_1_name
+        self.model_2_name = model_2_name
         self.model_1 = model_1
         self.model_2 = model_2
         self.ids_1 = ids_1
@@ -170,17 +172,30 @@ class BTM():
     def get_topic_closeness(self):
         if self.topic_closeness is None:
             self.compute_topic_closeness_and_uniqueness()
-        return self.topic_closeness[ self.topic_closeness.Topic_model_2 != -1 ].copy()
+        return self.topic_closeness[ self.topic_closeness.Topic_model_2 != -1 ].rename(columns={"Topic_label_model_1":f"{self.model_1_name} Topic Label",
+            "Topic_label_model_2":f"{self.model_2_name} Topic Label",
+            "Topic_model_1":f"{self.model_1_name} Topic Id",
+            "Topic_model_2":f"{self.model_2_name} Topic Id",
+            "Closeness":f"Topic Closeness",
+            "Couple_counts": "Total Couple matches",
+            "Count":"Topic Corpus Occurrences"}
+            ).copy()
     
     def get_topic_uniqueness(self):
         if self.topic_closeness is None:
             self.compute_topic_closeness_and_uniqueness()
-        return self.topic_closeness[ self.topic_closeness.Topic_model_2 == -1 ].copy()
+        return self.topic_closeness[ self.topic_closeness.Topic_model_2 == -1 ][['Topic_label_model_1','Topic_model_1','Closeness']].rename(columns={"Topic_label_model_1":f"{self.model_1_name} Topic Label",
+            "Topic_model_1":f"{self.model_1_name} Topic Id",
+            "Closeness":f"Topic Uniqueness"},
+            ).copy()
     
     def get_topic_alignment(self):
         if self.topic_alignment is None:
             self.compute_topic_alignment()
-        return self.topic_alignment.copy()
+        return self.topic_alignment[['Topic_label_model_1','Topic_model_1','Alignment']].rename(columns={"Topic_label_model_1":f"{self.model_1_name} Topic Label",
+            "Topic_model_1":f"{self.model_1_name} Topic Id",
+            "Closeness":f"Topic Alignment"},
+            ).copy()
     
     def get_corpus_closeness(self):
         if self.corpus_closeness is None:
@@ -201,28 +216,34 @@ class BTM():
 
         if self.corpus_closeness is None:
             self.compute_corpus_closeness()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Closeness: {self.corpus_closeness}')
 
         if self.corpus_uniqueness is None:
             self.compute_corpus_uniqueness()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Uniqueness: {self.corpus_uniqueness}')
 
         if self.corpus_alignment is None:
             self.compute_corpus_alignment()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Alignment: {self.corpus_alignment}')
 
     def print_weighted_corpus_metrics(self):
 
         if self.corpus_closeness is None:
             self.compute_corpus_closeness()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Closeness: {self.corpus_weighted_closeness}')
 
         if self.corpus_uniqueness is None:
             self.compute_corpus_uniqueness()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Uniqueness: {self.corpus_weighted_uniqueness}')
 
         if self.corpus_alignment is None:
             self.compute_corpus_alignment()
+        print(f'Evaluation: {self.model_1_name} -> {self.model_2_name}')
         print(f'Corpus Alignment: {self.corpus_weighted_alignment}')
 
 
@@ -280,7 +301,7 @@ class BTM():
         line_ax.axis('off')
 
         
-        fig.suptitle(f'Model 1 ({topic_1}) vs Model 2 ({topic_2})', fontsize=20, fontweight='bold', y=0.98)
+        fig.suptitle(f'{self.model_1_name} ({topic_1}) vs {self.model_2_name} ({topic_2})', fontsize=20, fontweight='bold', y=0.98)
 
         plt.tight_layout()
         plt.show()
