@@ -1,5 +1,5 @@
 import datetime as dt
-
+import re
 
 def df_info(f):
     def wrapper(df, *args, **kwargs):
@@ -14,3 +14,23 @@ def df_info(f):
         for i in range(100): print("-", end='')
         return result
     return wrapper
+
+
+def preprocess_text(text):
+    # Virus nomenclature: A(H7N9) → AH7N9
+    text = re.sub(r'[\(\)\[\]\{\}]', ' ', text)
+    text = re.sub(r"[.,]", " ", text)
+
+    
+    # Removes percentage, symbols and number
+    text = re.sub(r'\d+[\.,]?\d*\s*%', '', text)  
+    text = re.sub(r'>\s*\d+', '', text)           
+    text = re.sub(r'\d+\/\d+','',text)
+
+    text = re.sub(r'(?<!\w)-|-(?!\w)', '', text)
+
+    # Remove references such as [1,2] and (Smith et al., 2020)
+    text = re.sub(r'\[\d+(?:,\d+)*\]', '', text)
+    text = re.sub(r'\([A-Z][a-z]+\s+et\s+al\.,?\s+\d{4}\)', '', text)
+
+    return text
