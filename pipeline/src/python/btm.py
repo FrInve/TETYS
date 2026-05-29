@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 class BTM():
 
-    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1,texts_2,embeddings_2,model_1_name="Model_1",model_2_name="Model_2"):
+    def __init__(self,model_1,model_2,ids_1,texts_1,embeddings_1,texts_2,embeddings_2,model_1_name="Model_1",model_2_name="Model_2",percentile_threshold=0.05):
 
         self.model_1_name = model_1_name
         self.model_2_name = model_2_name
@@ -17,6 +17,7 @@ class BTM():
         self.embeddings_1 = embeddings_1
         self.embeddings_2 = embeddings_2
         self.texts_2 = texts_2
+        self.percentile_threshold = percentile_threshold
 
         self.n_topics_model_1 = None
         self.topics_matrix = None
@@ -29,6 +30,7 @@ class BTM():
         self.corpus_alignment = None
         self.corpus_weighted_alignment = None
         self.cooccurence_matrix = None
+        self.TH = None
 
         self.sanity_check()
         self.init()
@@ -55,13 +57,14 @@ class BTM():
         _, sims_in = self.model_2.transform(self.texts_2, embeddings=self.embeddings_2)
         mask_incluster = (topics_2 != -1)
         sims_in_clean = sims_in[mask_incluster]
-        TH = np.quantile(sims_in_clean, 0.05) 
+        self.TH = np.quantile(sims_in_clean, self.percentile_threshold) 
 
-        print(f"Threshold:{TH}")
+        print(f"Threshold:{self.TH}")
         # Cross topic
         topics, probabilty = self.model_2.transform(self.texts_1, embeddings=self.embeddings_1)
 
-        topics_accepted = np.where(probabilty >= TH, topics, -1)
+        
+        topics_accepted = np.where(probabilty >= self.TH, topics, -1)
 
         if self.model_2.custom_labels_ == None:
             model_2_topic_dict = self.model_2.topic_labels_
@@ -93,6 +96,10 @@ class BTM():
         else:
            model_1_topics = model_1_topics.rename(columns={'CustomName':'Topic_label'})
 
+        
+        #to remove
+        no_out_index = model_1_topics[model_1_topics['Topic'] != -1 ].index 
+
         model_1_topics = model_1_topics[ model_1_topics.Topic != -1 ].copy()
         
         self.cooccurence_matrix = model_1_topics.merge(model_2_topics,on='id',suffixes=('_model_1','_model_2'))
@@ -102,6 +109,16 @@ class BTM():
         self.topics_matrix = topics_couple.merge(self.model_1.get_topic_info()[['Count','Topic']].rename(columns={'Topic':'Topic_model_1'}),on='Topic_model_1')
 
         self.n_topics_model_1 = model_1_topics['Topic'].nunique()
+
+        
+        probabilty = probabilty[ no_out_index ]
+        print(f"{len(probabilty[probabilty < self.TH])}/{len(probabilty)} are classified as outlier due to their threshold values")
+
+        pd.DataFrame({'topic_assigned_pre_filter': [ model_2_topic_dict[topic] for topic in topics[no_out_index] ],
+                      'probability' : probabilty,
+                      'text' : self.texts_1[no_out_index],
+                      'id' : self.ids_1[no_out_index],
+                      }).to_parquet(f'test_{self.model_1_name}_{self.model_2_name}.parquet')
 
 
     def evaluate_metrics(self):
@@ -258,7 +275,9 @@ class BTM():
             min_font_size=10
         ).generate_from_frequencies(text)
 
-        ax.imshow(wc, interpolation="bilinear")
+        wc_image = np.array(wc.to_image())
+
+        ax.imshow(wc_image, interpolation="bilinear")
         ax.axis("off")
 
         if title:

@@ -5,27 +5,26 @@ from loguru import logger
 import pandas as pd
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datetime import datetime
-import polars as pl 
 from glob import glob
 import torch
 
+# Select the data source from one of the following values ['science_news','the_guardian']
 MAGAZINE = 'science_news'
 
-BATCH_SIZE = 50
-
-MAX_INPUT_TOKENS = 5000
-
+# Set configuration params to fit the memory  
+BATCH_SIZE = 1
+MAX_INPUT_TOKENS = 9500
 MAX_INPUT_CHARS = MAX_INPUT_TOKENS * 4
 
-
+# In the dataset file, the column name that contains the text data
 DATASET_TEXT_FEATURE = (
-    "text"  # In the dataset file, the column name that contains the text data
+    "text"  
 )
 
-
+# Load the data source parameters
 cfg_dict = cfg.MAGAZINE_CONFIG[MAGAZINE]
 
-
+# Logger creation
 log_file = Path(cfg.LOGS_FOLDER) / "summary_creation.log"
 
 logger.add(
@@ -36,8 +35,8 @@ logger.add(
         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"       
 )
 
-logger.info(f'Starting summarization for {MAGAZINE} articles...')
 
+logger.info(f'Starting summarization for {MAGAZINE} articles...')
 
 logger.info(f'Loading dataframe ...')
 
@@ -45,21 +44,18 @@ df = pd.read_parquet(cfg_dict['DATASET_PATH'])
 
 logger.info(f'The {MAGAZINE} dataset contains {len(df)} records')
 
-#text = df['text'].to_list()
-#ids = df['id'].to_list()
+logger.info(f'The model that will be used for the summarization step is {cfg.SUMMARIZATION_MODEL}')
 
-model_name = "Qwen/Qwen3-0.6B"
-
-logger.info(f'The model that will be used for summary creation is {model_name}')
-
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(cfg.SUMMARIZATION_MODEL)
 model = AutoModelForCausalLM.from_pretrained(
-    model_name,
+    cfg.SUMMARIZATION_MODEL,
     dtype="auto",
     device_map="auto"
 )
 
 def summarize_text(raw_text):
+
+    # Summarization prompt
     messages = [
     {
         "role": "user",
@@ -80,14 +76,16 @@ def summarize_text(raw_text):
                               return_tensors="pt",
                               truncation=True,
                               max_length=MAX_INPUT_TOKENS).to(model.device)
+    
     with torch.inference_mode():
         generated_ids = model.generate(
         **model_inputs,
-        max_new_tokens=150,
+        max_new_tokens=250,
         do_sample = False,
         temperature = 0.0,
         repetition_penalty=1.05
         )
+    
     output_ids = generated_ids[0][len(model_inputs.input_ids[0]):].tolist() 
 
     # parsing thinking content
@@ -103,7 +101,7 @@ path = f'{cfg_dict['SUMMARIES_PATH']}/{MAGAZINE}_summaries_*.parquet'
 filenames = glob(path)
 
 if filenames:
-    logger.info(f'There are {len(filenames)} files that contain text already summaried')
+    logger.info(f'There are {len(filenames)} files that contain text already summarized')
     
     dataset_list = [ pd.read_parquet(file) for file in filenames]
 
@@ -128,10 +126,7 @@ for current_count, row in enumerate(df_to_be_summarized.itertuples(index=False),
     text = row.text
     id_ = row.id
 
-    #logger.info(f'Summarizing {row['id']} : length: {len(row['text'])}')
-
     if len(text) > MAX_INPUT_CHARS:
-        #logger.warning(f'{row['id']} text will be truncated, too long text')
         flush_memory = True
 
     try:
@@ -146,10 +141,10 @@ for current_count, row in enumerate(df_to_be_summarized.itertuples(index=False),
         continue
 
     if flush_memory:
-        #logger.warning(f'Flush the cache after the execution of heavy text')
+        logger.warning(f'Flush the cache after the execution of heavy text')
         torch.cuda.empty_cache()
         gc.collect()
-        #logger.warning(f'Memory flushed')
+        logger.warning(f'Memory flushed')
         flush_memory = False
     
     if current_count % BATCH_SIZE == 0:
@@ -161,8 +156,6 @@ for current_count, row in enumerate(df_to_be_summarized.itertuples(index=False),
         batch_number += 1
         summarization_list = []
         ids = []
-        #torch.cuda.empty_cache()
-        #gc.collect()
 
 if summarization_list:
     summaries = pd.DataFrame({'id': ids, 'summary': summarization_list})
@@ -172,7 +165,3 @@ if summarization_list:
     logger.info(f'Final file created: {filename}')
 
 logger.info('Execution finished, all the texts have been summarized')
-    
-
-
-

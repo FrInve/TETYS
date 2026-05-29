@@ -11,9 +11,11 @@ from pathlib import Path
 import numpy as np
 from datetime import datetime
 
-MAGAZINE = 'scopus'
+# Select the data source from one of the following values ['science_news','the_guardian','scopus']
+MAGAZINE = 'the_guardian'
 cfg_dict = cfg.MAGAZINE_CONFIG[MAGAZINE]
 
+# Setting log
 log_file = Path(cfg.LOGS_FOLDER) / "embedding_creation.log"
 
 logger.add(
@@ -24,8 +26,8 @@ logger.add(
     format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}"       
 )
 
-# Load summaries to embed
-
+# Scopus loads abstracts
+# Science news and the guardian load summaries
 if MAGAZINE == 'scopus':
     path_records = f'{cfg_dict['DATASET_PATH']}'
     records_filenames = glob(path_records)
@@ -55,7 +57,6 @@ else:
 
 
 # Load summaries already embedded
-
 path_embeddings  = f'{cfg_dict['EMBEDDINGS_PATH']}/{MAGAZINE}_embeddings_*.npz'
 embeddings_filenames = glob(path_embeddings)
 
@@ -81,8 +82,7 @@ if len(df_to_be_embedded) == 0:
     logger.info("Nothing to embed. Exiting.")
     raise SystemExit(0)
 
-# Model 
-
+# Embedding model selection
 model_path = cfg.EMBEDDING_MODEL
 logger.info(f'Embeddings will be created using {model_path} model')
 
@@ -91,8 +91,9 @@ model = AutoModel.from_pretrained(model_path,dtype=torch.bfloat16, device_map={'
 # inference mode
 model.eval()
 
+# Number of embeddings in a single batch
 BATCH_SIZE = 1
-# How many batch save the embeddigs on file
+# Number of batch in a single file
 BATCH_IN_SINGLE_FILE = 5
 
 # Compute embeddings
@@ -171,15 +172,16 @@ for row in df_to_be_embedded.itertuples(index=False):
     if batch_counter_in_file >= BATCH_IN_SINGLE_FILE:
         save_to_npz()
 
-if file_ids:
+if batch_ids:
     logger.info('Saving the last embeddings...')    
     emb_summaries = encode(batch_texts)
     file_ids.extend(batch_ids)
     file_texts.extend(batch_texts)
     file_embeddings.append(emb_summaries)
-    save_to_npz()
-    torch.cuda.empty_cache()
-    gc.collect()
+
+save_to_npz()
+torch.cuda.empty_cache()
+gc.collect()
 
 logger.info('Embeddings computation finished.')
 
